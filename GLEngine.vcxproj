@@ -165,7 +165,6 @@
   <ItemGroup>
     <ClInclude Include="Source\AABB.h" />
     <ClInclude Include="Source\Application.h" />
-    <ClInclude Include="Source\CollisionResponseInteraction.h" />
     <ClInclude Include="Source\ECS\ECS.h" />
     <ClInclude Include="Source\ECS\ECSComponent.h" />
     <ClInclude Include="Source\ECS\ECSSystem.h" />
@@ -180,8 +179,10 @@
     <ClInclude Include="Source\GameComponentSystem\RenderableMeshComponentSystem.h" />
     <ClInclude Include="Source\GameComponentSystem\TransformComponent.h" />
     <ClInclude Include="Source\InteractionWorld.h" />
-    <ClInclude Include="Source\Maze.h" />
     <ClInclude Include="Source\MotionIntegrators.h" />
+    <ClInclude Include="Source\Platform\SDL2\SDLApplication.h" />
+    <ClInclude Include="Source\Platform\SDL2\SDLTiming.h" />
+    <ClInclude Include="Source\Platform\SDL2\SDLWindow.h" />
     <ClInclude Include="Source\Rendering\Camera.h" />
     <ClInclude Include="Source\Rendering\Display.h" />
     <ClInclude Include="Source\Rendering\Font.h" />
@@ -196,14 +197,15 @@
   <ItemGroup>
     <ClCompile Include="Source\AABB.cpp" />
     <ClCompile Include="Source\Application.cpp" />
-    <ClCompile Include="Source\CollisionResponseInteraction.cpp" />
     <ClCompile Include="Source\ECS\ECS.cpp" />
     <ClCompile Include="Source\ECS\ECSComponent.cpp" />
     <ClCompile Include="Source\ECS\ECSSystem.cpp" />
     <ClCompile Include="Source\Events\GameEventHandler.cpp" />
     <ClCompile Include="Source\InteractionWorld.cpp" />
     <ClCompile Include="Source\Main.cpp" />
-    <ClCompile Include="Source\Maze.cpp" />
+    <ClCompile Include="Source\Platform\SDL2\SDLApplication.cpp" />
+    <ClCompile Include="Source\Platform\SDL2\SDLTiming.cpp" />
+    <ClCompile Include="Source\Platform\SDL2\SDLWindow.cpp" />
     <ClCompile Include="Source\Rendering\Display.cpp" />
     <ClCompile Include="Source\Rendering\Font.cpp" />
     <ClCompile Include="Source\Rendering\Mesh.cpp" />

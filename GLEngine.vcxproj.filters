@@ -2,19 +2,25 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="ECS">
-      <UniqueIdentifier>{75001919-300f-4e6f-8af9-e0118188b80c}</UniqueIdentifier>
+      <UniqueIdentifier>{ed9388ca-e0c0-4441-b8d6-82a6b5a54f5b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Events">
-      <UniqueIdentifier>{e13dbe99-6f6d-4ac9-b7eb-22753e293917}</UniqueIdentifier>
+      <UniqueIdentifier>{479ef487-c93b-40d2-8a72-f0b3ad09e325}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering">
-      <UniqueIdentifier>{b325cbb9-ea86-4f0e-adf5-ff590abe280c}</UniqueIdentifier>
+      <UniqueIdentifier>{0f04dbe3-0dd2-4751-bba9-98031b8a8148}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\SDL2">
+      <UniqueIdentifier>{0c9098a9-36df-4b8a-b584-a72630cefe83}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{3bac62b0-b301-414e-ac59-fdeea74b6453}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameComponentSystem">
-      <UniqueIdentifier>{d27cf056-d67e-4698-a5c5-89f2cdb5754c}</UniqueIdentifier>
+      <UniqueIdentifier>{4fdf3ce1-d6d4-43f9-9f08-68d29a6b30cc}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty">
-      <UniqueIdentifier>{326db681-9fe8-486b-bed7-2a344dd58a4c}</UniqueIdentifier>
+      <UniqueIdentifier>{135422fe-05e9-4fec-9dcf-67de1a6a4954}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -48,12 +54,15 @@
     <ClCompile Include="Source\Rendering\Texture.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="Source\AABB.cpp" />
-    <ClCompile Include="Source\Application.cpp" />
-    <ClCompile Include="Source\CollisionResponseInteraction.cpp" />
-    <ClCompile Include="Source\InteractionWorld.cpp" />
-    <ClCompile Include="Source\Main.cpp" />
-    <ClCompile Include="Source\Maze.cpp" />
+    <ClCompile Include="Source\Platform\SDL2\SDLApplication.cpp">
+      <Filter>Platform\SDL2</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Platform\SDL2\SDLTiming.cpp">
+      <Filter>Platform\SDL2</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Platform\SDL2\SDLWindow.cpp">
+      <Filter>Platform\SDL2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ECS\ECS.h">
@@ -76,24 +85,6 @@
     </ClInclude>
     <ClInclude Include="Source\Events\MotionControl.h">
       <Filter>Events</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameComponentSystem\CameraComponentSystem.h">
-      <Filter>GameComponentSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameComponentSystem\ColliderComponent.h">
-      <Filter>GameComponentSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameComponentSystem\MotionComponentSystem.h">
-      <Filter>GameComponentSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameComponentSystem\MovementControlComponentSystem.h">
-      <Filter>GameComponentSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameComponentSystem\RenderableMeshComponentSystem.h">
-      <Filter>GameComponentSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameComponentSystem\TransformComponent.h">
-      <Filter>GameComponentSystem</Filter>
     </ClInclude>
     <ClInclude Include="Source\Rendering\Camera.h">
       <Filter>Rendering</Filter>
@@ -119,15 +110,35 @@
     <ClInclude Include="Source\Rendering\Texture.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GameComponentSystem\CameraComponentSystem.h">
+      <Filter>GameComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameComponentSystem\ColliderComponent.h">
+      <Filter>GameComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameComponentSystem\MotionComponentSystem.h">
+      <Filter>GameComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameComponentSystem\MovementControlComponentSystem.h">
+      <Filter>GameComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameComponentSystem\RenderableMeshComponentSystem.h">
+      <Filter>GameComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameComponentSystem\TransformComponent.h">
+      <Filter>GameComponentSystem</Filter>
+    </ClInclude>
     <ClInclude Include="Source\ThirdParty\stb_image.h">
       <Filter>ThirdParty</Filter>
     </ClInclude>
-    <ClInclude Include="Source\AABB.h" />
-    <ClInclude Include="Source\Application.h" />
-    <ClInclude Include="Source\CollisionResponseInteraction.h" />
-    <ClInclude Include="Source\InteractionWorld.h" />
-    <ClInclude Include="Source\Maze.h" />
-    <ClInclude Include="Source\MotionIntegrators.h" />
-    <ClInclude Include="Source\Transform.h" />
+    <ClInclude Include="Source\Platform\SDL2\SDLApplication.h">
+      <Filter>Platform\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Platform\SDL2\SDLTiming.h">
+      <Filter>Platform\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Platform\SDL2\SDLWindow.h">
+      <Filter>Platform\SDL2</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
