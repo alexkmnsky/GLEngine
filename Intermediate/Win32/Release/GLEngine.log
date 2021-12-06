@@ -1,0 +1,21 @@
+﻿  AABB.cpp
+  Application.cpp
+  CollisionResponseInteraction.cpp
+  ECS.cpp
+  ECSComponent.cpp
+  ECSSystem.cpp
+  GameEventHandler.cpp
+  InteractionWorld.cpp
+  Main.cpp
+  Maze.cpp
+  Display.cpp
+  Font.cpp
+  Mesh.cpp
+  Shader.cpp
+  TextRenderer.cpp
+  Texture.cpp
+  Generating code
+  Previous IPDB not found, fall back to full compilation.
+  All 2702 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  GLEngine.vcxproj -> C:\Users\Galaxy\Desktop\GitHub\GLEngine\Binaries\Win32\Release\GLEngine.exe

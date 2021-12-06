@@ -1,0 +1,55 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Don't ignore OBJ models
+!/Assets/Models/*.obj
+
+# Precompiled Headers
+#*.gch
+#*.pch
+
+# Compiled Dynamic libraries
+#*.so
+#*.dylib
+#*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+#*.lai
+#*.la
+#*.a
+#*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+*.exe.recipe
+*.idb
+#*.pdb # We want debug symbols
+**/GLEngine.pdb
+# Just not for the actual build
+
+*.ilk
+*.iobj
+*.ipdb
+*.vcxproj.FileListAbsolute.txt
+
+# RenderDoc
+/RenderDoc
+
+*.tlog
+*.tlog
+
+# Visual Studio
+/.vs

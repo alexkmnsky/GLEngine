@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ECS">
+      <UniqueIdentifier>{75001919-300f-4e6f-8af9-e0118188b80c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events">
+      <UniqueIdentifier>{e13dbe99-6f6d-4ac9-b7eb-22753e293917}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{b325cbb9-ea86-4f0e-adf5-ff590abe280c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameComponentSystem">
+      <UniqueIdentifier>{d27cf056-d67e-4698-a5c5-89f2cdb5754c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{326db681-9fe8-486b-bed7-2a344dd58a4c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\ECS\ECS.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ECS\ECSComponent.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ECS\ECSSystem.cpp">
+      <Filter>ECS</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Events\GameEventHandler.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Rendering\Display.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Rendering\Font.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Rendering\Mesh.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Rendering\Shader.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Rendering\TextRenderer.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Rendering\Texture.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\AABB.cpp" />
+    <ClCompile Include="Source\Application.cpp" />
+    <ClCompile Include="Source\CollisionResponseInteraction.cpp" />
+    <ClCompile Include="Source\InteractionWorld.cpp" />
+    <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Maze.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\ECS\ECS.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ECS\ECSComponent.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ECS\ECSSystem.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Events\GameEventHandler.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Events\IApplicationEventHandler.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Events\InputControl.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Events\MotionControl.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameComponentSystem\CameraComponentSystem.h">
+      <Filter>GameComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameComponentSystem\ColliderComponent.h">
+      <Filter>GameComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameComponentSystem\MotionComponentSystem.h">
+      <Filter>GameComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameComponentSystem\MovementControlComponentSystem.h">
+      <Filter>GameComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameComponentSystem\RenderableMeshComponentSystem.h">
+      <Filter>GameComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameComponentSystem\TransformComponent.h">
+      <Filter>GameComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\Camera.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\Display.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\Font.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\GameRenderContext.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\Mesh.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\Shader.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\TextRenderer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\Texture.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ThirdParty\stb_image.h">
+      <Filter>ThirdParty</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\AABB.h" />
+    <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\CollisionResponseInteraction.h" />
+    <ClInclude Include="Source\InteractionWorld.h" />
+    <ClInclude Include="Source\Maze.h" />
+    <ClInclude Include="Source\MotionIntegrators.h" />
+    <ClInclude Include="Source\Transform.h" />
+  </ItemGroup>
+</Project>
