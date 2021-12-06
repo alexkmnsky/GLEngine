@@ -63,6 +63,9 @@
     <ClCompile Include="Source\Platform\SDL2\SDLWindow.cpp">
       <Filter>Platform\SDL2</Filter>
     </ClCompile>
+    <ClCompile Include="Source\AABB.cpp" />
+    <ClCompile Include="Source\InteractionWorld.cpp" />
+    <ClCompile Include="Source\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ECS\ECS.h">
@@ -140,5 +143,10 @@
     <ClInclude Include="Source\Platform\SDL2\SDLWindow.h">
       <Filter>Platform\SDL2</Filter>
     </ClInclude>
+    <ClInclude Include="Source\AABB.h" />
+    <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\InteractionWorld.h" />
+    <ClInclude Include="Source\MotionIntegrators.h" />
+    <ClInclude Include="Source\Transform.h" />
   </ItemGroup>
 </Project>

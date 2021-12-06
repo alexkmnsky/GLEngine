@@ -196,7 +196,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\AABB.cpp" />
-    <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\ECS\ECS.cpp" />
     <ClCompile Include="Source\ECS\ECSComponent.cpp" />
     <ClCompile Include="Source\ECS\ECSSystem.cpp" />
