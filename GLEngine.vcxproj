@@ -180,6 +180,7 @@
     <ClInclude Include="Source\GameComponentSystem\TransformComponent.h" />
     <ClInclude Include="Source\InteractionWorld.h" />
     <ClInclude Include="Source\MotionIntegrators.h" />
+    <ClInclude Include="Source\Platform\OpenGL\OpenGLRenderDevice.h" />
     <ClInclude Include="Source\Platform\SDL2\SDLApplication.h" />
     <ClInclude Include="Source\Platform\SDL2\SDLTiming.h" />
     <ClInclude Include="Source\Platform\SDL2\SDLWindow.h" />
@@ -193,6 +194,7 @@
     <ClInclude Include="Source\Rendering\Texture.h" />
     <ClInclude Include="Source\ThirdParty\stb_image.h" />
     <ClInclude Include="Source\Transform.h" />
+    <ClInclude Include="Source\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\AABB.cpp" />
@@ -202,6 +204,7 @@
     <ClCompile Include="Source\Events\GameEventHandler.cpp" />
     <ClCompile Include="Source\InteractionWorld.cpp" />
     <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Platform\OpenGL\OpenGLRenderDevice.cpp" />
     <ClCompile Include="Source\Platform\SDL2\SDLApplication.cpp" />
     <ClCompile Include="Source\Platform\SDL2\SDLTiming.cpp" />
     <ClCompile Include="Source\Platform\SDL2\SDLWindow.cpp" />

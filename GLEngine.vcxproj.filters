@@ -2,25 +2,28 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="ECS">
-      <UniqueIdentifier>{ed9388ca-e0c0-4441-b8d6-82a6b5a54f5b}</UniqueIdentifier>
+      <UniqueIdentifier>{13c921b8-d1de-47a9-940c-3cdeafbebcb4}</UniqueIdentifier>
     </Filter>
     <Filter Include="Events">
-      <UniqueIdentifier>{479ef487-c93b-40d2-8a72-f0b3ad09e325}</UniqueIdentifier>
+      <UniqueIdentifier>{597d30a3-2484-4136-88c2-0b8bfaff0be9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering">
-      <UniqueIdentifier>{0f04dbe3-0dd2-4751-bba9-98031b8a8148}</UniqueIdentifier>
+      <UniqueIdentifier>{1b5e105b-5d2d-4078-a36c-96450ec2248f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Platform\SDL2">
-      <UniqueIdentifier>{0c9098a9-36df-4b8a-b584-a72630cefe83}</UniqueIdentifier>
+      <UniqueIdentifier>{0c0acbaa-3cac-49a8-8c0a-96ab00556587}</UniqueIdentifier>
     </Filter>
     <Filter Include="Platform">
-      <UniqueIdentifier>{3bac62b0-b301-414e-ac59-fdeea74b6453}</UniqueIdentifier>
+      <UniqueIdentifier>{79f88a56-4a7f-4cb8-a326-54a9e0b5ee07}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\OpenGL">
+      <UniqueIdentifier>{b161bab5-e9dd-4660-8468-a4eb965cf641}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameComponentSystem">
-      <UniqueIdentifier>{4fdf3ce1-d6d4-43f9-9f08-68d29a6b30cc}</UniqueIdentifier>
+      <UniqueIdentifier>{37cebc5b-5c45-427a-9abe-ced2d298313f}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty">
-      <UniqueIdentifier>{135422fe-05e9-4fec-9dcf-67de1a6a4954}</UniqueIdentifier>
+      <UniqueIdentifier>{f9d6eee9-3ed7-4fe0-81f5-bece06525595}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -62,6 +65,9 @@
     </ClCompile>
     <ClCompile Include="Source\Platform\SDL2\SDLWindow.cpp">
       <Filter>Platform\SDL2</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Platform\OpenGL\OpenGLRenderDevice.cpp">
+      <Filter>Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="Source\AABB.cpp" />
     <ClCompile Include="Source\InteractionWorld.cpp" />
@@ -113,6 +119,15 @@
     <ClInclude Include="Source\Rendering\Texture.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Platform\SDL2\SDLApplication.h">
+      <Filter>Platform\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Platform\SDL2\SDLTiming.h">
+      <Filter>Platform\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Platform\SDL2\SDLWindow.h">
+      <Filter>Platform\SDL2</Filter>
+    </ClInclude>
     <ClInclude Include="Source\GameComponentSystem\CameraComponentSystem.h">
       <Filter>GameComponentSystem</Filter>
     </ClInclude>
@@ -134,19 +149,14 @@
     <ClInclude Include="Source\ThirdParty\stb_image.h">
       <Filter>ThirdParty</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Platform\SDL2\SDLApplication.h">
-      <Filter>Platform\SDL2</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Platform\SDL2\SDLTiming.h">
-      <Filter>Platform\SDL2</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Platform\SDL2\SDLWindow.h">
-      <Filter>Platform\SDL2</Filter>
+    <ClInclude Include="Source\Platform\OpenGL\OpenGLRenderDevice.h">
+      <Filter>Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="Source\AABB.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\InteractionWorld.h" />
     <ClInclude Include="Source\MotionIntegrators.h" />
     <ClInclude Include="Source\Transform.h" />
+    <ClInclude Include="Source\Window.h" />
   </ItemGroup>
 </Project>

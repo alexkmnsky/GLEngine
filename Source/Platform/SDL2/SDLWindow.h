@@ -24,6 +24,10 @@ public:
 	inline unsigned int GetHeight() { return height; }
 
 private:
+	// Disallow copy and assign
+	SDLWindow(const SDLWindow& other) = delete;
+	void operator=(const SDLWindow& other) = delete;
+
 	WindowHandle window;
 	unsigned int width;
 	unsigned int height;
