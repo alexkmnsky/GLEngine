@@ -227,13 +227,16 @@ private:
 	void SetShader(unsigned int shader);
 	void SetFaceCulling(FaceCulling faceCulling);
 	void SetDepthTest(bool shouldWrite, DrawFunc depthFunc);
-	void SetBlending(BlendFunc sourceBlend, BlendFunc destBlend);
+	void SetBlending(BlendFunc sourceBlend, BlendFunc destinationBlend);
 	void SetStencilTest(bool enable, DrawFunc stencilFunc, unsigned int stencilTestMask,
 		unsigned int stencilWriteMask, unsigned int stencilComparisonVal, StencilOp stencilFail, 
 		StencilOp stencilPassButDepthFail, StencilOp stencilPass);
 	void SetStencilWriteMask(unsigned int mask);
 	void SetScissorTest(bool enable, unsigned int startX = 0, unsigned int startY = 0,
 		unsigned int width = 0, unsigned int height = 0);
+
+	unsigned int GetVersion();
+	std::string GetShaderVersion();
 
 	static bool isInitialized;
 	DeviceContext context;
