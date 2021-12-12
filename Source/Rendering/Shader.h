@@ -1,10 +1,11 @@
 #pragma once
 
-#include "Transform.h"
-#include "Camera.h"
+#include "RenderDevice.h"
+#include "UniformBuffer.h"
+#include "Texture.h"
+#include "Sampler.h"
 
 #include <string>
-#include <GL/glew.h>
 
 class Shader
 {
@@ -12,47 +13,32 @@ public:
 	/**
 	 * Loads a shader from a file.
 	 *
-	 * @param fileName File path to the shader without extension. The constructor will automatically
-	 *		assume that a *.vert file exists for the vertex shader and that a *.frag file exists
-	 *		for the fragment shader.
+	 * @param device: The target render device to create the shader for.
+	 * @param fileName: File path to the shader. VERTEX_SHADER_BUILD will be defined when compiling
+	 * the vertex shader. FRAGMENT_SHADER_BUILD will be defined when compiling the fragment shader.
 	 */
-	Shader(const std::string& fileName);
-
-	/** @brief Instructs the GPU to bind/use the shader. */
-	void Bind();
-
-	/** @brief Update the transformation (model view projection) matrix */
-	void Update(const glm::mat4& matrix);
-
-	/**
-	 * @brief Update the transformation (model view projection) matrix.
-	 * 
-	 * @param transform The transform, which contains the model matrix to use.
-	 * @param camera The camera, which contains the view projection matrix to use.
-	 */
-	void Update(const Transform& transform, const Camera& camera);
-
-	inline GLuint GetProgram() { return program; }
-
+	Shader(RenderDevice& device, const std::string& fileName);
 	virtual ~Shader();
 
-protected:
-private:
-	static const unsigned int NUM_SHADERS = 2;
+	inline void SetUniformBuffer(const std::string& name, UniformBuffer& buffer)
+	{
+		device->SetShaderUniformBuffer(deviceID, name, buffer.GetID());
+	}
 
+	inline void SetSampler(const std::string& name, Texture& texture, Sampler& sampler,
+		unsigned int unit)
+	{
+		device->SetShaderSampler(deviceID, name, texture.GetID(), sampler.GetID(), unit);
+	}
+
+	inline unsigned int GetID() { return deviceID; }
+
+private:
 	// Disallow copy and assign
 	Shader(const Shader& other) = delete;
 	void operator=(const Shader& other) = delete;
 
-	enum
-	{
-		TRANSFORM_U,
-
-		NUM_UNIFORMS,
-	};
-
-	GLuint program;
-	GLuint shaders[NUM_SHADERS];
-	GLuint uniforms[NUM_UNIFORMS];
+	RenderDevice* device;
+	unsigned int deviceID;
 };
 

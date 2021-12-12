@@ -2,13 +2,13 @@
 
 #include "ECS/ECS.h"
 #include "TransformComponent.h"
-#include "Rendering/GameRenderContext.h"
+#include "GameRenderContext.h"
 
 /** @brief Component which defines the visible mesh of an entity. */
 struct RenderableMeshComponent : public ECSComponent<RenderableMeshComponent>
 {
 	// The mesh to use
-	Mesh* mesh = nullptr;
+	VertexArray* mesh = nullptr;
 
 	// The texture to apply onto the mesh
 	Texture* texture = nullptr;
@@ -33,7 +33,7 @@ public:
 		TransformComponent* transform = (TransformComponent*)components[0];
 		RenderableMeshComponent* mesh = (RenderableMeshComponent*)components[1];
 
-		context.RenderMesh(*mesh->mesh, *mesh->texture, transform->transform);
+		context.RenderMesh(*mesh->mesh, *mesh->texture, transform->transform.GetModel());
 	}
 private:
 	GameRenderContext& context;

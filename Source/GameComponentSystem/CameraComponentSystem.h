@@ -2,7 +2,7 @@
 
 #include "ECS/ECS.h"
 #include "TransformComponent.h"
-#include "Rendering/GameRenderContext.h"
+#include "GameRenderContext.h"
 #include "Rendering/Camera.h"
 #include "Transform.h"
 

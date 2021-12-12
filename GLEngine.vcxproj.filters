@@ -2,28 +2,28 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="ECS">
-      <UniqueIdentifier>{13c921b8-d1de-47a9-940c-3cdeafbebcb4}</UniqueIdentifier>
+      <UniqueIdentifier>{20a5b203-d50d-4bf5-b0f7-553e8fdb604e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Events">
-      <UniqueIdentifier>{597d30a3-2484-4136-88c2-0b8bfaff0be9}</UniqueIdentifier>
+      <UniqueIdentifier>{d3154610-3d02-4c12-9c7c-03036e4b7f39}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering">
-      <UniqueIdentifier>{1b5e105b-5d2d-4078-a36c-96450ec2248f}</UniqueIdentifier>
+      <UniqueIdentifier>{6c1c9da8-1b70-4c6a-89f9-d59ce43e31f8}</UniqueIdentifier>
     </Filter>
     <Filter Include="Platform\SDL2">
-      <UniqueIdentifier>{0c0acbaa-3cac-49a8-8c0a-96ab00556587}</UniqueIdentifier>
+      <UniqueIdentifier>{edeee116-e34e-4bc0-9503-2a10d2a89904}</UniqueIdentifier>
     </Filter>
     <Filter Include="Platform">
-      <UniqueIdentifier>{79f88a56-4a7f-4cb8-a326-54a9e0b5ee07}</UniqueIdentifier>
+      <UniqueIdentifier>{a8a779b7-8056-4266-a66e-68febf2650f6}</UniqueIdentifier>
     </Filter>
     <Filter Include="Platform\OpenGL">
-      <UniqueIdentifier>{b161bab5-e9dd-4660-8468-a4eb965cf641}</UniqueIdentifier>
+      <UniqueIdentifier>{8e6b05f6-cd7d-4710-9025-732c9a00e2a5}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameComponentSystem">
-      <UniqueIdentifier>{37cebc5b-5c45-427a-9abe-ced2d298313f}</UniqueIdentifier>
+      <UniqueIdentifier>{515e4400-8b36-46f9-a9b5-aa861cf041da}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty">
-      <UniqueIdentifier>{f9d6eee9-3ed7-4fe0-81f5-bece06525595}</UniqueIdentifier>
+      <UniqueIdentifier>{2427e8ac-cae2-4052-b20a-7cd6fb4cdef3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -39,10 +39,13 @@
     <ClCompile Include="Source\Events\GameEventHandler.cpp">
       <Filter>Events</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Rendering\Display.cpp">
+    <ClCompile Include="Source\Rendering\ArrayBitmap.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="Source\Rendering\Font.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Rendering\IndexedModel.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="Source\Rendering\Mesh.cpp">
@@ -69,9 +72,6 @@
     <ClCompile Include="Source\Platform\OpenGL\OpenGLRenderDevice.cpp">
       <Filter>Platform\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="Source\AABB.cpp" />
-    <ClCompile Include="Source\InteractionWorld.cpp" />
-    <ClCompile Include="Source\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ECS\ECS.h">
@@ -95,19 +95,31 @@
     <ClInclude Include="Source\Events\MotionControl.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Rendering\Camera.h">
+    <ClInclude Include="Source\Rendering\ArrayBitmap.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Rendering\Display.h">
+    <ClInclude Include="Source\Rendering\Camera.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Source\Rendering\Font.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Rendering\GameRenderContext.h">
+    <ClInclude Include="Source\Rendering\IndexedModel.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Source\Rendering\Mesh.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\RenderContext.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\RenderDevice.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\RenderTarget.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\Sampler.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Source\Rendering\Shader.h">
@@ -119,6 +131,12 @@
     <ClInclude Include="Source\Rendering\Texture.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Rendering\UniformBuffer.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\VertexArray.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Platform\SDL2\SDLApplication.h">
       <Filter>Platform\SDL2</Filter>
     </ClInclude>
@@ -127,6 +145,9 @@
     </ClInclude>
     <ClInclude Include="Source\Platform\SDL2\SDLWindow.h">
       <Filter>Platform\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Platform\OpenGL\OpenGLRenderDevice.h">
+      <Filter>Platform\OpenGL</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameComponentSystem\CameraComponentSystem.h">
       <Filter>GameComponentSystem</Filter>
@@ -149,14 +170,5 @@
     <ClInclude Include="Source\ThirdParty\stb_image.h">
       <Filter>ThirdParty</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Platform\OpenGL\OpenGLRenderDevice.h">
-      <Filter>Platform\OpenGL</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\AABB.h" />
-    <ClInclude Include="Source\Application.h" />
-    <ClInclude Include="Source\InteractionWorld.h" />
-    <ClInclude Include="Source\MotionIntegrators.h" />
-    <ClInclude Include="Source\Transform.h" />
-    <ClInclude Include="Source\Window.h" />
   </ItemGroup>
 </Project>

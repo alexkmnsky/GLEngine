@@ -5,7 +5,6 @@
 #include <SDL2/sdl.h>
 #include <ctime>
 
-#include "Rendering/Display.h"
 #include "Rendering/Shader.h"
 #include "Rendering/Mesh.h"
 #include "Rendering/Texture.h"
@@ -13,9 +12,10 @@
 #include "Rendering/Camera.h"
 #include "Application.h"
 #include "Events/GameEventHandler.h"
-#include "Rendering/GameRenderContext.h"
+#include "GameRenderContext.h"
 #include "InteractionWorld.h"
 #include "Rendering/TextRenderer.h"
+#include "Timing.h"
 
 #include "GameComponentSystem/TransformComponent.h"
 #include "GameComponentSystem/ColliderComponent.h"
@@ -59,35 +59,35 @@ private:
 // TODO refactor main
 int main(int argc, char** argv)
 {
-	// Initialize SDL
-	SDL_Init(SDL_INIT_EVERYTHING);
+	Application* application = Application::Create();
+	Window window(*application, WIDTH, HEIGHT, "GLEngine");
+	RenderDevice device(window);
+	Sampler sampler(device, RenderDevice::FILTER_LINEAR_MIPMAP_LINEAR);
 
-	// Create window
-	Display display(WIDTH, HEIGHT, "GLEngine");
-	Application application(&display);
-
-	// Load flag mesh (used for the end of the level)
-	Mesh meshFlag("./Assets/Models/Flag.obj");
-	
-	// Load shaders
-	// shaderBasic is used for drawing 3D geometry
-	Shader shaderBasic("./Assets/Shaders/BasicShader");
-	// shaderText is used for drawing text
-	Shader shaderText("./Assets/Shaders/TextShader");
-
-	// Load textures
-	Texture textureFlag("./Assets/Textures/Flag.png");
+	Shader shader(device, "./Assets/Shaders/BasicShader.glsl");
 
 	// Create a camera used for rendering
-	Camera camera(70.0f, (float)WIDTH / (float)HEIGHT, 0.01f, 1000.0f, glm::vec3(0.0f));
+	Camera camera(70.0f, (float)WIDTH / (float)HEIGHT, 0.1f, 1000.0f, glm::vec3(0.0f, 0.0f, 1.0f));
 
-	// See GameRenderContext for more info...
-	GameRenderContext gameRenderContext(shaderBasic, camera);
+	RenderDevice::DrawParameters drawParameters;
+	drawParameters.primitiveType = RenderDevice::PRIMITIVE_TRIANGLES;
+	drawParameters.faceCulling = RenderDevice::FACE_CULL_BACK;
+	drawParameters.shouldWriteDepth = true;
+	drawParameters.depthFunc = RenderDevice::DRAW_FUNC_LESS;
 
-	// Create the text renderer and load fonts used
-	TextRenderer textRenderer(WIDTH, HEIGHT, shaderText);
-	Font fontSmall = textRenderer.LoadFont("./Assets/Fonts/ArialBold.ttf", 16);
-	Font fontLarge = textRenderer.LoadFont("./Assets/Fonts/ArialBold.ttf", 48);
+	RenderTarget target(device);
+	GameRenderContext gameRenderContext(device, target, drawParameters, shader, sampler, camera);
+
+	std::vector<IndexedModel> models = LoadModels("./Assets/Models/Flag.obj");
+	VertexArray vertexArray(device, models[0], RenderDevice::USAGE_STATIC_DRAW);
+
+	// Load textures
+	Texture textureFlag(device, "./Assets/Textures/Flag.png",RenderDevice::FORMAT_RGBA,false,false);
+
+	//// Create the text renderer and load fonts used
+	//TextRenderer textRenderer(WIDTH, HEIGHT, shaderText);
+	//Font fontSmall = textRenderer.LoadFont("./Assets/Fonts/ArialBold.ttf", 16);
+	//Font fontLarge = textRenderer.LoadFont("./Assets/Fonts/ArialBold.ttf", 48);
 
 	// Create the ECS
 	ECS ecs;
@@ -122,7 +122,7 @@ int main(int argc, char** argv)
 	cameraComponent.offset = Transform(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
 	// Set mesh and texture for the flag
-	renderableMeshComponent.mesh = &meshFlag;
+	renderableMeshComponent.mesh = &vertexArray;
 	renderableMeshComponent.texture = &textureFlag;
 
 	// Finally, create the player!
@@ -141,31 +141,19 @@ int main(int argc, char** argv)
 	mainSystems.AddSystem(spinningSystem);
 	renderingPipeline.AddSystem(renderableMeshSystem);
 
-	// Time values used for calculating delta time and framerate
-	unsigned int frameCounter = 0, frames = 0, fps = 0;
-	unsigned int currentTime = SDL_GetTicks(), previousTime = currentTime;
+	// Time values used for calculating delta time
+	float currentTime = Timing::GetTime(), previousTime = currentTime;
 
 	// Game loop; keep updating until the window is closed
-	while (!application.IsClosed())
+	while (application->IsRunning())
 	{
 		// Update time values
-		currentTime = SDL_GetTicks();
-		float deltaTime = (currentTime - previousTime) / 1000.0f;
-		frameCounter += (currentTime - previousTime);
-		frames++;
+		currentTime = Timing::GetTime();
+		float deltaTime = currentTime - previousTime;
 		previousTime = currentTime;
 
-		// If one second has passed, get the number of frames since the previous second
-		// This value can be used to determine the frames per second
-		if (frameCounter >= 1000)
-		{
-			frameCounter = 0;
-			fps = frames;
-			frames = 0;
-		}
-
 		// Process application events; keypresses, mouse buttons/motion, window resizing, etc.
-		application.ProcessEvents(eventHandler);
+		application->ProcessMessages(deltaTime, eventHandler);
 
 		// Update all game logic systems
 		ecs.UpdateSystems(mainSystems, deltaTime);
@@ -174,24 +162,25 @@ int main(int argc, char** argv)
 		interactionWorld.ProcessInteractions(deltaTime);
 
 		// Clear the display for rendering the next frame
-		display.Clear(0.6f, 0.8f, 1.0f, 1.0f);
+		gameRenderContext.Clear(0.6f, 0.8f, 1.0f, 1.0f, true);
 
 		// Update the rendering pipeline
 		ecs.UpdateSystems(renderingPipeline, deltaTime);
 
-		// Draw shadow first
-		textRenderer.RenderText(fontLarge, "Hello world!",
-			WIDTH/2 + 2.5, HEIGHT/2 - 2.5, 1.0f, glm::vec3(0.25f, 0.25f, 0.25f), true);
-			
-		textRenderer.RenderText(fontLarge, "Hello world!",
-			WIDTH/2, HEIGHT/2, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
+		//// Draw shadow first
+		//textRenderer.RenderText(fontLarge, "Hello world!",
+		//	WIDTH/2 + 2.5, HEIGHT/2 - 2.5, 1.0f, glm::vec3(0.25f, 0.25f, 0.25f), true);
+		//	
+		//textRenderer.RenderText(fontLarge, "Hello world!",
+		//	WIDTH/2, HEIGHT/2, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
+
+		gameRenderContext.Flush();
 
 		// Swap buffers
-		display.Update();
+		window.Present();
 	}
 
-	// Quit SDL...
-	SDL_Quit();
+	delete application;
 
 	return 0;
 }

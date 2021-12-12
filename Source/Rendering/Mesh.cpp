@@ -6,33 +6,6 @@
 #include <Assimp/scene.h>
 #include <Assimp/postprocess.h>
 
-void IndexedModel::CalculateNormals()
-{
-	// Iterate over all triangles in the model
-	for (unsigned int i = 0; i < indices.size(); i += 3)
-	{
-		// Get the three vertex indices of the triangle in the model
-		int i0 = indices[i];
-		int i1 = indices[i + 1];
-		int i2 = indices[i + 2];
-
-		// Calculate the normal of the triangle
-		glm::vec3 v1 = positions[i1] - positions[i0];
-		glm::vec3 v2 = positions[i2] - positions[i0];
-
-		glm::vec3 normal = glm::normalize(glm::cross(v1, v2));
-
-		// Set the normal for each vertex
-		normals[i0] += normal;
-		normals[i1] += normal;
-		normals[i2] += normal;
-	}
-
-	// Iterate over all vertices and normalize the normal
-	for (unsigned int i = 0; i < positions.size(); i++)
-		normals[i] = glm::normalize(normals[i]);
-}
-
 std::vector<IndexedModel> LoadModels(const std::string& fileName)
 {
 	std::vector<IndexedModel> models;
@@ -56,6 +29,12 @@ std::vector<IndexedModel> LoadModels(const std::string& fileName)
 		const aiMesh* model = scene->mMeshes[i];
 
 		IndexedModel newModel;
+		newModel.AllocateElement(3); // Positions
+		newModel.AllocateElement(2); // Texture Coordinates
+		newModel.AllocateElement(3); // Normals
+		newModel.AllocateElement(3); // Tangents
+		newModel.SetInstancedElementStartIndex(4); // Begin instanced data
+		newModel.AllocateElement(16); // Transform matrix
 
 		const aiVector3D aiZeroVector(0.0f, 0.0f, 0.0f);
 
@@ -71,11 +50,10 @@ std::vector<IndexedModel> LoadModels(const std::string& fileName)
 
 			const aiVector3D tangent = model->mTangents[j];
 
-			newModel.positions.push_back(glm::vec3(position.x, position.y, position.z));
-			newModel.normals.push_back(glm::vec3(normal.x, normal.y, normal.z));
-			newModel.textureCoordinates.push_back(
-				glm::vec2(textureCoordinate.x, textureCoordinate.y));
-			newModel.tangents.push_back(glm::vec3(tangent.x, tangent.y, tangent.z));
+			newModel.AddElement3f(0, position.x, position.y, position.z);
+			newModel.AddElement2f(1, textureCoordinate.x, textureCoordinate.y);
+			newModel.AddElement3f(2, normal.x, normal.y, normal.z);
+			newModel.AddElement3f(3, tangent.x, tangent.y, tangent.z);
 		}
 
 		// Loop over all faces in the model
@@ -84,9 +62,7 @@ std::vector<IndexedModel> LoadModels(const std::string& fileName)
 			const aiFace& face = model->mFaces[j];
 			// The model should be triangulated as we passed the aiProcess_Triangulate flag
 			assert(face.mNumIndices == 3);
-			newModel.indices.push_back(face.mIndices[0]);
-			newModel.indices.push_back(face.mIndices[1]);
-			newModel.indices.push_back(face.mIndices[2]);
+			newModel.AddIndices3i(face.mIndices[0], face.mIndices[1], face.mIndices[2]);
 		}
 
 		models.push_back(newModel);
@@ -94,7 +70,7 @@ std::vector<IndexedModel> LoadModels(const std::string& fileName)
 
 	return models;
 }
-
+/*
 Mesh::Mesh(const std::string& fileName)
 {
 	// LoadModels will return an empty vector if
@@ -175,4 +151,4 @@ void Mesh::Draw()
 Mesh::~Mesh()
 {
 	glDeleteVertexArrays(1, &vertexArrayObject);
-}
+}*/

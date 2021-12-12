@@ -98,7 +98,7 @@ OpenGLRenderDevice::OpenGLRenderDevice(Window& window) :
 	glEnable(GL_DEPTH_TEST); // Ensures we have a depth buffer (for more info look up Z-buffering)
 	glDepthFunc(DRAW_FUNC_ALWAYS); // Default the depth buffer to always pass; we will set later
 	glDepthMask(GL_FALSE); // Default to disabling depth buffer write; this can change later
-	glFrontFace(GL_CW); // Specifies the orientation of front-facing polygons, we want clockwise
+	glFrontFace(GL_CCW); // Specifies which side front-facing based on vertex winding order
 }
 
 OpenGLRenderDevice::~OpenGLRenderDevice()
@@ -156,6 +156,7 @@ unsigned int OpenGLRenderDevice::CreateVertexArray(const float** vertexData,
 	glGenVertexArrays(1, &vao);
 	SetVAO(vao);
 
+	glGenBuffers(numBuffers, buffers);
 	for (unsigned int i = 0, attribute = 0; i < numBuffers - 1; i++)
 	{
 		BufferUsage attributeUsage = usage;
@@ -439,8 +440,23 @@ unsigned int OpenGLRenderDevice::CreateShaderProgram(const std::string& shaderTe
 		return (unsigned int)-1;
 	}
 
-	std::string vertexShaderText = "#define VERTEX_SHADER_BUILD\n" + shaderText;
-	std::string fragmentShaderText = "#define FRAGMENT_SHADER_BUILD\n" + shaderText;
+	// #version ... must come before anything else; we will insert the define after it.
+	size_t defineInsertPosition = shaderText.find("\n", shaderText.find("#version"));
+
+	// We did not find #version. This is likely because the shader is missing #version; error.
+	if (defineInsertPosition == std::string::npos)
+	{
+		std::cerr << "Error: Shader program is missing #version directive." << std::endl;
+		return (unsigned int)-1;
+	}
+
+	defineInsertPosition++; // Set the position after the newline
+
+	std::string vertexShaderText = shaderText;
+	std::string fragmentShaderText = shaderText;
+
+	vertexShaderText.insert(defineInsertPosition, "#define VERTEX_SHADER_BUILD\n");
+	fragmentShaderText.insert(defineInsertPosition, "#define FRAGMENT_SHADER_BUILD\n");
 
 	ShaderProgram programData;
 	if (!AddShader(shaderProgram, vertexShaderText, GL_VERTEX_SHADER, &programData.shaders))
@@ -493,7 +509,7 @@ unsigned int OpenGLRenderDevice::ReleaseShaderProgram(unsigned int shader)
 {
 	if (shader == 0) return 0;
 
-	std::unordered_map<unsigned int, ShaderProgram>::iterator programIt = shaderProgramMap.find(shader);
+	auto programIt = shaderProgramMap.find(shader);
 	if (programIt == shaderProgramMap.end())
 	{
 		return 0;
