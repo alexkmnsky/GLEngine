@@ -8,6 +8,10 @@
 
 #include "Font.h"
 #include "Shader.h"
+#include "IndexedModel.h"
+#include "VertexArray.h"
+#include "UniformBuffer.h"
+#include "RenderDevice.h"
 
 class TextRenderer
 {
@@ -19,7 +23,7 @@ public:
 	 * @param height The window height in pixels.
 	 * @param shader Reference to the text shader which defines how characters are rendered.
 	 */
-	TextRenderer(int width, int height, Shader& shader);
+	TextRenderer(int width, int height, RenderDevice& device, Shader& shader);
 
 	/**
 	 * Loads a font file and prepares the first 128 characters for rendering. Currently, only
@@ -65,10 +69,13 @@ private:
 	void operator=(const TextRenderer& other) = delete;
 
 	FT_Library ft;
+	RenderDevice* device;
 	Shader& shader;
 	glm::mat4 projection;
 
-	GLuint vertexArrayObject;
-	GLuint vertexBufferObject;
+	RenderDevice::DrawParameters drawParameters;
+
+	unsigned int vao;
+	unsigned int vbo;
 };
 
