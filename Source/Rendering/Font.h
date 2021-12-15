@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Texture.h"
+#include "RenderDevice.h"
+
 #include <ft2build.h>
 #include <freetype/freetype.h>
 
@@ -16,12 +19,14 @@ public:
 	 * 
 	 * @param face Fontface to use.
 	 */
-	Font(FT_Face face);
+	Font(RenderDevice& device, FT_Face face);
+
+	virtual ~Font();
 
 	/** @brief Stores all metrics used for a glyph. */
 	struct Character
 	{
-		unsigned int textureID; // ID handle of the glyph texture
+		Texture* texture;       // ID handle of the glyph texture
 		glm::ivec2 size;        // Size of glyph
 		glm::ivec2 bearing;     // Offset from baseline to left/top of glyph
 		unsigned int advance;   // Offset to advance to next glyph
@@ -36,6 +41,8 @@ public:
 	inline Character GetCharacter(char c) { return characters[c]; }
 
 private:
+	RenderDevice* device;
+
 	std::map<char, Character> characters;
 };
 

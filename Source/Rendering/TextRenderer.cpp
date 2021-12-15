@@ -1,7 +1,8 @@
 #include "TextRenderer.h"
 
-TextRenderer::TextRenderer(int width, int height, RenderDevice& device, Shader& shader) : 
-	device(&device), shader(shader)
+TextRenderer::TextRenderer(int width, int height, RenderDevice& device, RenderTarget& target, 
+	Shader& shader, Sampler& sampler) :	device(&device), target(&target), shader(shader), 
+	sampler(sampler)
 {
 	if (FT_Init_FreeType(&ft))
 	{
@@ -10,10 +11,10 @@ TextRenderer::TextRenderer(int width, int height, RenderDevice& device, Shader& 
 
 	projection = glm::ortho(0.0f, (float)width, 0.0f, (float)height);
 
-	const unsigned int elementSizes[] = { 2, 2 }; // 2 for position, 2 for texture coordinates
+	//const unsigned int elementSizes[] = { 2, 2 }; // 2 for position, 2 for texture coordinates
 
-	vao = this->device->CreateVertexArray(nullptr, elementSizes, 2, 0, 4, nullptr, 6, 
-		RenderDevice::USAGE_DYNAMIC_DRAW);
+	//vao = this->device->CreateVertexArray(nullptr, elementSizes, 2, 0, 4, nullptr, 6, 
+	//	RenderDevice::USAGE_DYNAMIC_DRAW);
 
 	drawParameters.primitiveType = RenderDevice::PRIMITIVE_TRIANGLES;
 
@@ -39,14 +40,14 @@ void TextRenderer::RenderText(Font& font, const std::string& text, float x, floa
 	shader.SetUniformBuffer("textColor", textColor);
 
 	// Activate corresponding render state
-	shader.Bind();
-	shader.Update(projection);
-	glUniform3f(glGetUniformLocation(shader.GetProgram(), "textColor"), color.x, color.y, color.z);
-	glActiveTexture(GL_TEXTURE0);
-	glBindVertexArray(vertexArrayObject);
+	//shader.Bind();
+	//shader.Update(projection);
+	//glUniform3f(glGetUniformLocation(shader.GetProgram(), "textColor"), color.x, color.y, color.z);
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindVertexArray(vertexArrayObject);
 
 	// Disable depth test; text should draw over other text
-	glDisable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
 
 	// Find the width of the text for centering
 	float textWidth = 0.0f, textAdvance = 0.0f;
@@ -100,29 +101,39 @@ void TextRenderer::RenderText(Font& font, const std::string& text, float x, floa
 		model.AddIndices3i(0, 1, 2); // Triangle 1
 		model.AddIndices3i(0, 2, 3); // Triangle 2
 
+		unsigned int vertexArray = model.CreateVertexArray(*device, RenderDevice::USAGE_STATIC_DRAW);
+
+		shader.SetSampler("text", *(character.texture), sampler, 0);
+		device->Draw(target->GetID(), shader.GetID(), vertexArray, drawParameters,
+			1, model.GetNumIndices());
+
+		device->ReleaseVertexArray(vertexArray);
+
 		// Update vertex buffer object for each character
 		// 6 vertices to create a quad, with 4 floats each
 		// (2 for position, 2 for texture coordinates)
-		float vertices[6][4] = {
-			{ xPosition,         yPosition + height, 0.0f, 0.0f },
-			{ xPosition,         yPosition,          0.0f, 1.0f },
-			{ xPosition + width, yPosition,          1.0f, 1.0f },
+		//float vertices[6][4] = {
+		//	{ xPosition,         yPosition + height, 0.0f, 0.0f },
+		//	{ xPosition,         yPosition,          0.0f, 1.0f },
+		//	{ xPosition + width, yPosition,          1.0f, 1.0f },
 
-			{ xPosition,         yPosition + height, 0.0f, 0.0f },
-			{ xPosition + width, yPosition,          1.0f, 1.0f },
-			{ xPosition + width, yPosition + height, 1.0f, 0.0f }
-		};
+		//	{ xPosition,         yPosition + height, 0.0f, 0.0f },
+		//	{ xPosition + width, yPosition,          1.0f, 1.0f },
+		//	{ xPosition + width, yPosition + height, 1.0f, 0.0f }
+		//};
 
-		// Render glyph texture over quad
-		glBindTexture(GL_TEXTURE_2D, character.textureID);
 
-		// Update content of vertex buffer object memory
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		// Render quad
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		//// Render glyph texture over quad
+		//glBindTexture(GL_TEXTURE_2D, character.textureID);
+
+		//// Update content of vertex buffer object memory
+		//glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+		//glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+		//glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		//// Render quad
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		// Advance x position for next glyph
 		// Note that advance is the number of 1/64 pixels
@@ -130,9 +141,9 @@ void TextRenderer::RenderText(Font& font, const std::string& text, float x, floa
 	}
 
 	// Re-enable depth test
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 
-	glBindVertexArray(0);
+	//glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 

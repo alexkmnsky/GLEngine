@@ -12,6 +12,8 @@
 #include "VertexArray.h"
 #include "UniformBuffer.h"
 #include "RenderDevice.h"
+#include "RenderTarget.h"
+#include "Sampler.h"
 
 class TextRenderer
 {
@@ -23,7 +25,7 @@ public:
 	 * @param height The window height in pixels.
 	 * @param shader Reference to the text shader which defines how characters are rendered.
 	 */
-	TextRenderer(int width, int height, RenderDevice& device, Shader& shader);
+	TextRenderer(int width, int height, RenderDevice& device, RenderTarget& target, Shader& shader, Sampler& sampler);
 
 	/**
 	 * Loads a font file and prepares the first 128 characters for rendering. Currently, only
@@ -41,7 +43,7 @@ public:
 			std::cerr << "Font loading failed for font: " << fileName << std::endl;
 		}
 		FT_Set_Pixel_Sizes(face, 0, pixelSize);
-		return Font(face);
+		return Font(*device, face);
 	}
 
 	/**
@@ -69,13 +71,12 @@ private:
 	void operator=(const TextRenderer& other) = delete;
 
 	FT_Library ft;
-	RenderDevice* device;
-	Shader& shader;
-	glm::mat4 projection;
 
 	RenderDevice::DrawParameters drawParameters;
-
-	unsigned int vao;
-	unsigned int vbo;
+	RenderDevice* device;
+	RenderTarget* target;
+	Shader& shader;
+	Sampler& sampler;
+	glm::mat4 projection;
 };
 

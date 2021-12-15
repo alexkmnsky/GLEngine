@@ -65,6 +65,7 @@ int main(int argc, char** argv)
 	Sampler sampler(device, RenderDevice::FILTER_LINEAR_MIPMAP_LINEAR);
 
 	Shader shader(device, "./Assets/Shaders/BasicShader.glsl");
+	Shader shaderText(device, "./Assets/Shaders/TextShader.glsl");
 
 	// Create a camera used for rendering
 	Camera camera(70.0f, (float)WIDTH / (float)HEIGHT, 0.1f, 1000.0f, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -84,10 +85,10 @@ int main(int argc, char** argv)
 	// Load textures
 	Texture textureFlag(device, "./Assets/Textures/Flag.png",RenderDevice::FORMAT_RGBA,false,false);
 
-	//// Create the text renderer and load fonts used
-	//TextRenderer textRenderer(WIDTH, HEIGHT, shaderText);
-	//Font fontSmall = textRenderer.LoadFont("./Assets/Fonts/ArialBold.ttf", 16);
-	//Font fontLarge = textRenderer.LoadFont("./Assets/Fonts/ArialBold.ttf", 48);
+	// Create the text renderer and load fonts used
+	TextRenderer textRenderer(WIDTH, HEIGHT, device, target, shaderText, sampler);
+	Font fontSmall = textRenderer.LoadFont("./Assets/Fonts/ArialBold.ttf", 16);
+	Font fontLarge = textRenderer.LoadFont("./Assets/Fonts/ArialBold.ttf", 48);
 
 	// Create the ECS
 	ECS ecs;
@@ -167,12 +168,12 @@ int main(int argc, char** argv)
 		// Update the rendering pipeline
 		ecs.UpdateSystems(renderingPipeline, deltaTime);
 
-		//// Draw shadow first
-		//textRenderer.RenderText(fontLarge, "Hello world!",
-		//	WIDTH/2 + 2.5, HEIGHT/2 - 2.5, 1.0f, glm::vec3(0.25f, 0.25f, 0.25f), true);
-		//	
-		//textRenderer.RenderText(fontLarge, "Hello world!",
-		//	WIDTH/2, HEIGHT/2, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
+		// Draw shadow first
+		textRenderer.RenderText(fontLarge, "Hello world!",
+			WIDTH/2 + 2.5, HEIGHT/2 - 2.5, 1.0f, glm::vec3(0.25f, 0.25f, 0.25f), true);
+			
+		textRenderer.RenderText(fontLarge, "Hello world!",
+			WIDTH/2, HEIGHT/2, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
 
 		gameRenderContext.Flush();
 
