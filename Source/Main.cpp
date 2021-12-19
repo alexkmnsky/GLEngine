@@ -73,8 +73,8 @@ int main(int argc, char** argv)
 	RenderDevice::DrawParameters drawParameters;
 	drawParameters.primitiveType = RenderDevice::PRIMITIVE_TRIANGLES;
 	drawParameters.faceCulling = RenderDevice::FACE_CULL_BACK;
-	drawParameters.shouldWriteDepth = true;
 	drawParameters.depthFunc = RenderDevice::DRAW_FUNC_LESS;
+	drawParameters.shouldWriteDepth = true;
 
 	RenderTarget target(device);
 	GameRenderContext gameRenderContext(device, target, drawParameters, shader, sampler, camera);
@@ -168,6 +168,8 @@ int main(int argc, char** argv)
 		// Update the rendering pipeline
 		ecs.UpdateSystems(renderingPipeline, deltaTime);
 
+		gameRenderContext.Flush();
+
 		// Draw shadow first
 		textRenderer.RenderText(fontLarge, "Hello world!",
 			WIDTH/2 + 2.5, HEIGHT/2 - 2.5, 1.0f, glm::vec3(0.25f, 0.25f, 0.25f), true);
@@ -175,7 +177,6 @@ int main(int argc, char** argv)
 		textRenderer.RenderText(fontLarge, "Hello world!",
 			WIDTH/2, HEIGHT/2, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
 
-		gameRenderContext.Flush();
 
 		// Swap buffers
 		window.Present();

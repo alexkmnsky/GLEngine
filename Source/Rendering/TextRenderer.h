@@ -25,7 +25,8 @@ public:
 	 * @param height The window height in pixels.
 	 * @param shader Reference to the text shader which defines how characters are rendered.
 	 */
-	TextRenderer(int width, int height, RenderDevice& device, RenderTarget& target, Shader& shader, Sampler& sampler);
+	TextRenderer(int width, int height, RenderDevice& device, RenderTarget& target, Shader& shader, 
+		Sampler& sampler);
 
 	/**
 	 * Loads a font file and prepares the first 128 characters for rendering. Currently, only
@@ -78,5 +79,7 @@ private:
 	Shader& shader;
 	Sampler& sampler;
 	glm::mat4 projection;
+
+	unsigned int vao;
 };
 

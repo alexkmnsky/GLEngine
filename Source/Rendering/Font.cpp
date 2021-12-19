@@ -32,20 +32,9 @@ Font::Font(RenderDevice& device, FT_Face face) : device(&device)
 		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-		Texture* texture;
-		if (face->glyph->bitmap.width == 0 || face->glyph->bitmap.rows == 0)
-		{
-			const ArrayBitmap textureData;
-
-			texture = new Texture(*(this->device), textureData, RenderDevice::FORMAT_R, false, false);
-		}			
-		else
-		{
-			const ArrayBitmap textureData(face->glyph->bitmap.width, face->glyph->bitmap.rows,
-				(int*)face->glyph->bitmap.buffer);
-
-			texture = new Texture(*(this->device), textureData, RenderDevice::FORMAT_R, false, false);
-		}
+		unsigned int texture = this->device->CreateTexture2D(face->glyph->bitmap.width,
+			face->glyph->bitmap.rows, face->glyph->bitmap.buffer, RenderDevice::FORMAT_R,
+			RenderDevice::FORMAT_R, false, false);
 
 		// Store character for later use
 		Character character = { texture,
@@ -68,6 +57,6 @@ Font::~Font()
 	// Delete all character textures
 	for (const auto& character : characters)
 	{
-		delete character.second.texture;
+		this->device->ReleaseTexture2D(character.second.textureID);
 	}
 }
