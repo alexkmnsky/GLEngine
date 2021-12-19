@@ -11,8 +11,8 @@ class GameRenderContext : public RenderContext
 public:
 	GameRenderContext(RenderDevice& device, RenderTarget& target,
 		RenderDevice::DrawParameters& drawParameters, Shader& shader, Sampler& sampler,
-		Camera& camera) : RenderContext(device, target), drawParameters(drawParameters),
-		shader(shader), sampler(sampler), camera(camera) {}
+		Camera& camera) : RenderContext(device, target, drawParameters), shader(shader), 
+		sampler(sampler), camera(camera) {}
 
 	inline void RenderMesh(VertexArray& vertexArray, Texture& texture, const glm::mat4& transform)
 	{
@@ -23,7 +23,6 @@ public:
 	void Flush();
 
 private:
-	RenderDevice::DrawParameters& drawParameters;
 	Shader& shader;
 	Sampler& sampler;
 	Camera& camera;

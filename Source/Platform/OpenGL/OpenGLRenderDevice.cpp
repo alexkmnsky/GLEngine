@@ -169,7 +169,7 @@ unsigned int OpenGLRenderDevice::CreateVertexArray(const float** vertexData,
 		}
 
 		unsigned int elementSize = vertexElementSizes[i];
-		const void* bufferData = inInstancedMode ? nullptr : vertexData[i];
+		const void* bufferData = (inInstancedMode || vertexData == nullptr) ? nullptr : vertexData[i];
 		size_t dataSize = inInstancedMode 
 			? elementSize * sizeof(float) 
 			: elementSize * sizeof(float) * numVertices;
@@ -528,6 +528,68 @@ unsigned int OpenGLRenderDevice::ReleaseShaderProgram(unsigned int shader)
 	return 0;
 }
 
+void OpenGLRenderDevice::SetShaderInt(unsigned int shader, const std::string& name, int value)
+{
+	SetShader(shader);
+	GLint location = glGetUniformLocation(shader, name.c_str());
+	glUniform1i(location, value);
+}
+
+void OpenGLRenderDevice::SetShaderIntArray(unsigned int shader, const std::string& name, 
+	int* values, uint32_t count)
+{
+	SetShader(shader);
+	GLint location = glGetUniformLocation(shader, name.c_str());
+	glUniform1iv(location, count, values);
+}
+
+void OpenGLRenderDevice::SetShaderFloat(unsigned int shader, const std::string& name, float value)
+{
+	SetShader(shader);
+	GLint location = glGetUniformLocation(shader, name.c_str());
+	glUniform1f(location, value);
+}
+
+void OpenGLRenderDevice::SetShaderFloat2(unsigned int shader, const std::string& name, 
+	const float* values)
+{
+	SetShader(shader);
+	GLint location = glGetUniformLocation(shader, name.c_str());
+	glUniform2f(location, values[0], values[1]);
+}
+
+void OpenGLRenderDevice::SetShaderFloat3(unsigned int shader, const std::string& name, 
+	const float* values)
+{
+	SetShader(shader);
+	GLint location = glGetUniformLocation(shader, name.c_str());
+	glUniform3f(location, values[0], values[1], values[2]);
+}
+
+void OpenGLRenderDevice::SetShaderFloat4(unsigned int shader, const std::string& name, 
+	const float* values)
+{
+	SetShader(shader);
+	GLint location = glGetUniformLocation(shader, name.c_str());
+	glUniform4f(location, values[0], values[1], values[2], values[3]);
+}
+
+void OpenGLRenderDevice::SetShaderMat3(unsigned int shader, const std::string& name, 
+	const float* values)
+{
+	SetShader(shader);
+	GLint location = glGetUniformLocation(shader, name.c_str());
+	glUniformMatrix3fv(location, 1, GL_FALSE, values);
+}
+
+void OpenGLRenderDevice::SetShaderMat4(unsigned int shader, const std::string& name, 
+	const float* values)
+{
+	SetShader(shader);
+	GLint location = glGetUniformLocation(shader, name.c_str());
+	glUniformMatrix4fv(location, 1, GL_FALSE, values);
+}
+
 void OpenGLRenderDevice::Clear(unsigned int fbo, bool shouldClearColor, bool shouldClearDepth, 
 	bool shouldClearStencil, const float r, const float g, const float b, const float a, 
 	unsigned int stencil)
@@ -564,11 +626,7 @@ void OpenGLRenderDevice::Draw(unsigned int fbo, unsigned int shader, unsigned in
 	}
 	SetFBO(fbo);
 	SetViewport(fbo);
-	SetBlending(drawParameters.sourceBlend, drawParameters.destBlend);
-	SetScissorTest(drawParameters.useScissorTest, drawParameters.scissorStartX, 
-		drawParameters.scissorStartY, drawParameters.scissorWidth, drawParameters.scissorHeight);
-	SetFaceCulling(drawParameters.faceCulling);
-	SetDepthTest(drawParameters.shouldWriteDepth, drawParameters.depthFunc);
+	SetDrawParameters(drawParameters);
 	SetShader(shader);
 	SetVAO(vao);
 
@@ -581,6 +639,15 @@ void OpenGLRenderDevice::Draw(unsigned int fbo, unsigned int shader, unsigned in
 		glDrawElementsInstanced(drawParameters.primitiveType, (GLsizei)numElements, GL_UNSIGNED_INT, 
 			0, numInstances);
 	}
+}
+
+void OpenGLRenderDevice::SetDrawParameters(const OpenGLRenderDevice::DrawParameters& drawParameters)
+{
+	SetBlending(drawParameters.sourceBlend, drawParameters.destBlend);
+	SetScissorTest(drawParameters.useScissorTest, drawParameters.scissorStartX,
+		drawParameters.scissorStartY, drawParameters.scissorWidth, drawParameters.scissorHeight);
+	SetFaceCulling(drawParameters.faceCulling);
+	SetDepthTest(drawParameters.shouldWriteDepth, drawParameters.depthFunc);
 }
 
 void OpenGLRenderDevice::SetFBO(unsigned int fbo)

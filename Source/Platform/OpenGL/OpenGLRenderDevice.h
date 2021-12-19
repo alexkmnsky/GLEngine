@@ -186,12 +186,23 @@ public:
 		unsigned int sampler, unsigned int unit);
 	unsigned int ReleaseShaderProgram(unsigned int shader);
 
+	void SetShaderInt(unsigned int shader, const std::string& name, int value);
+	void SetShaderIntArray(unsigned int shader, const std::string& name, int* values, uint32_t count);
+	void SetShaderFloat(unsigned int shader, const std::string& name, float value);
+	void SetShaderFloat2(unsigned int shader, const std::string& name, const float* values);
+	void SetShaderFloat3(unsigned int shader, const std::string& name, const float* values);
+	void SetShaderFloat4(unsigned int shader, const std::string& name, const float* values);
+	void SetShaderMat3(unsigned int shader, const std::string& name, const float* values);
+	void SetShaderMat4(unsigned int shader, const std::string& name, const float* values);
+
 	void Clear(unsigned int fbo, bool shouldClearColor, bool shouldClearDepth, 
 		bool shouldClearStencil, const float r, const float g, const float b, const float a,
 		unsigned int stencil);
 
 	void Draw(unsigned int fbo, unsigned int shader, unsigned int vao, 
 		const DrawParameters& drawParameters, unsigned int numInstances, unsigned int numElements);
+
+	void SetDrawParameters(const OpenGLRenderDevice::DrawParameters& drawParameters);
 
 private:
 	// Disallow copy and assign
