@@ -57,10 +57,6 @@ void TextRenderer::RenderText(Font& font, const std::string& text, float x, floa
 	{
 		Font::Character character = font.GetCharacter(c);
 
-		//IndexedModel model;
-		//model.AllocateElement(2); // Position
-		//model.AllocateElement(2); // Texture Coordinate
-
 		float xPosition = x + character.bearing.x * scale;
 		float yPosition = y - (character.size.y - character.bearing.y) * scale;
 

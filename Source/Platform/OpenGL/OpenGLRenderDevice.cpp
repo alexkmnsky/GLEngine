@@ -76,7 +76,9 @@ OpenGLRenderDevice::OpenGLRenderDevice(Window& window) :
 	blendingEnabled(false),
 	shouldWriteDepth(false),
 	stencilTestEnabled(false),
-	scissorTestEnabled(false)
+	scissorTestEnabled(false),
+	currentPackAlignment(0),
+	currentUnpackAlignment(0)
 {
 	// Create OpenGL context in the target window
 	context = SDL_GL_CreateContext(window.GetWindowHandle());
@@ -363,12 +365,25 @@ static GLint GetOpenGLInternalFormat(enum OpenGLRenderDevice::PixelFormat format
 }
 
 unsigned int OpenGLRenderDevice::CreateTexture2D(int width, int height, const void* data, 
-	PixelFormat dataFormat, PixelFormat internalFormat, bool generateMipmaps, bool compress)
+	PixelFormat dataFormat, PixelFormat internalFormat, bool generateMipmaps, bool compress,
+	unsigned int packAlignment, unsigned int unpackAlignment)
 {
 	GLint format = GetOpenGLFormat(dataFormat);
 	GLint glInternalFormat = GetOpenGLInternalFormat(internalFormat, compress);
 	GLenum textureTarget = GL_TEXTURE_2D;
 	GLuint textureHandle;
+
+	if (packAlignment != currentPackAlignment)
+	{
+		glPixelStorei(GL_PACK_ALIGNMENT, packAlignment);
+		currentPackAlignment = packAlignment;
+	}
+
+	if (unpackAlignment != currentUnpackAlignment)
+	{
+		glPixelStorei(GL_UNPACK_ALIGNMENT, unpackAlignment);
+		currentUnpackAlignment = unpackAlignment;
+	}
 
 	glGenTextures(1, &textureHandle);
 	glBindTexture(textureTarget, textureHandle);

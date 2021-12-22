@@ -172,7 +172,8 @@ public:
 	unsigned int ReleaseSampler(unsigned int sampler);
 
 	unsigned int CreateTexture2D(int width, int height, const void* data, PixelFormat dataFormat, 
-		PixelFormat internalFormat,	bool generateMipmaps, bool compress);
+		PixelFormat internalFormat,	bool generateMipmaps, bool compress,
+		unsigned int packAlignment, unsigned int unpackAlignment);
 	unsigned int ReleaseTexture2D(unsigned int texture2D);
 
 	unsigned int CreateUniformBuffer(const void* data, size_t dataSize, BufferUsage usage);
@@ -276,4 +277,6 @@ private:
 	bool shouldWriteDepth;
 	bool stencilTestEnabled;
 	bool scissorTestEnabled;
+	unsigned int currentPackAlignment;
+	unsigned int currentUnpackAlignment;
 };

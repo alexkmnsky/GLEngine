@@ -11,7 +11,7 @@ Texture::Texture(RenderDevice& device, const ArrayBitmap& textureData,
 	isCompressed(shouldCompress), hasMipmaps(generateMipmaps)
 {
 	textureID = this->device->CreateTexture2D(width, height, textureData.GetPixelArray(),
-		RenderDevice::FORMAT_RGBA, internalPixelFomat, generateMipmaps, shouldCompress);
+		RenderDevice::FORMAT_RGBA, internalPixelFomat, generateMipmaps, shouldCompress, 0, 0);
 }
 
 Texture::Texture(RenderDevice& device, const std::string& fileName, 
@@ -31,7 +31,7 @@ Texture::Texture(RenderDevice& device, const std::string& fileName,
 	height = textureHeight;
 
 	textureID = this->device->CreateTexture2D(width, height, imageData,	RenderDevice::FORMAT_RGBA, 
-		internalPixelFomat, generateMipmaps, shouldCompress);
+		internalPixelFomat, generateMipmaps, shouldCompress, 0, 0);
 
 	stbi_image_free(imageData);
 }

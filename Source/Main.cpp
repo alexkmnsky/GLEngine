@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 	Application* application = Application::Create();
 	Window window(*application, WIDTH, HEIGHT, "GLEngine");
 	RenderDevice device(window);
-	Sampler sampler(device, RenderDevice::FILTER_LINEAR_MIPMAP_LINEAR);
+	Sampler sampler(device, RenderDevice::FILTER_LINEAR_MIPMAP_LINEAR, RenderDevice::FILTER_NEAREST);
 
 	Shader shader(device, "./Assets/Shaders/BasicShader.glsl");
 	Shader shaderText(device, "./Assets/Shaders/TextShader.glsl");
