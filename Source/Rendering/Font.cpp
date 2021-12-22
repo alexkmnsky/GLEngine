@@ -9,10 +9,7 @@ Font::Font(RenderDevice& device, FT_Face face) : device(&device)
 	for (unsigned char c = 0; c < 128; c++)
 	{
 		// Load character glyph
-		// FT_RENDER_MODE_SDF
-		unsigned int charIndex = FT_Get_Char_Index(face, c);
-
-		if (FT_Load_Char(face, c, ))
+		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
 		{
 			std::cerr << "Failed to load font glyph '" << c << "'" << std::endl;
 			continue;
