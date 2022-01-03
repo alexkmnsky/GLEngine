@@ -14,10 +14,13 @@
 #include "RenderDevice.h"
 #include "RenderTarget.h"
 #include "Sampler.h"
+#include "Transform.h"
+#include "Text.h"
 
 class TextRenderer
 {
 public:
+
 	/**
 	 * Initializes the text renderer and all used libraries.
 	 * 
@@ -36,15 +39,9 @@ public:
 	 * @param pixelSize Font size in pixels to generate.
 	 * @return A Font object which contans the needed data for rendering.
 	 */
-	inline Font LoadFont(const std::string& fileName, unsigned int pixelSize)
+	inline Font* LoadFont(const std::string& fileName, unsigned int pixelSize)
 	{
-		FT_Face face;
-		if (FT_New_Face(ft, fileName.c_str(), 0, &face))
-		{
-			std::cerr << "Font loading failed for font: " << fileName << std::endl;
-		}
-		FT_Set_Pixel_Sizes(face, 0, pixelSize);
-		return Font(*device, face);
+		return new Font(ft, *device, fileName, pixelSize);
 	}
 
 	/**
@@ -60,8 +57,10 @@ public:
 	 * @param isCentered Should the text be aligned to the center or to the top left. Defaults to
 	 *		top left.
 	 */
-	void RenderText(Font& font, const std::string& text, float x, float y, float scale, 
-		const glm::vec3& color, bool isCentered = false);
+	void RenderText(Text& text);
+
+	inline FT_Library& GetLibrary() { return ft; }
+	inline glm::mat4& GetProjection() { return projection; }
 
 	// Cleans up FreeType library
 	~TextRenderer();
@@ -79,7 +78,5 @@ private:
 	Shader& shader;
 	Sampler& sampler;
 	glm::mat4 projection;
-
-	unsigned int vao;
 };
 

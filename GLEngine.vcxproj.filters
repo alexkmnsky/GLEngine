@@ -72,6 +72,16 @@
     <ClCompile Include="Source\Platform\OpenGL\OpenGLRenderDevice.cpp">
       <Filter>Platform\OpenGL</Filter>
     </ClCompile>
+    <ClCompile Include="Source\AABB.cpp" />
+    <ClCompile Include="Source\GameRenderContext.cpp" />
+    <ClCompile Include="Source\InteractionWorld.cpp" />
+    <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Rendering\TexturePacker.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Rendering\Text.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ECS\ECS.h">
@@ -169,6 +179,20 @@
     </ClInclude>
     <ClInclude Include="Source\ThirdParty\stb_image.h">
       <Filter>ThirdParty</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\AABB.h" />
+    <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\GameRenderContext.h" />
+    <ClInclude Include="Source\InteractionWorld.h" />
+    <ClInclude Include="Source\MotionIntegrators.h" />
+    <ClInclude Include="Source\Timing.h" />
+    <ClInclude Include="Source\Transform.h" />
+    <ClInclude Include="Source\Window.h" />
+    <ClInclude Include="Source\Rendering\TexturePacker.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\Text.h">
+      <Filter>Rendering</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

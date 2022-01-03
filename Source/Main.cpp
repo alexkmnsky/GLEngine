@@ -15,6 +15,7 @@
 #include "GameRenderContext.h"
 #include "InteractionWorld.h"
 #include "Rendering/TextRenderer.h"
+#include "Rendering/Text.h"
 #include "Timing.h"
 
 #include "GameComponentSystem/TransformComponent.h"
@@ -26,8 +27,8 @@
 
 
 // Window size
-#define WIDTH 640
-#define HEIGHT 640
+#define WIDTH 1280
+#define HEIGHT 720
 
 /**
  * @brief System which updates the position of the entity according to the state of the motion
@@ -62,7 +63,7 @@ int main(int argc, char** argv)
 	Application* application = Application::Create();
 	Window window(*application, WIDTH, HEIGHT, "GLEngine");
 	RenderDevice device(window);
-	Sampler sampler(device, RenderDevice::FILTER_LINEAR_MIPMAP_LINEAR, RenderDevice::FILTER_NEAREST);
+	Sampler sampler(device);
 
 	Shader shader(device, "./Assets/Shaders/BasicShader.glsl");
 	Shader shaderText(device, "./Assets/Shaders/TextShader.glsl");
@@ -87,8 +88,18 @@ int main(int argc, char** argv)
 
 	// Create the text renderer and load fonts used
 	TextRenderer textRenderer(WIDTH, HEIGHT, device, target, shaderText, sampler);
-	Font fontSmall = textRenderer.LoadFont("./Assets/Fonts/ArialBold.ttf", 16);
-	Font fontLarge = textRenderer.LoadFont("./Assets/Fonts/ArialBold.ttf", 48);
+
+	Font* font = textRenderer.LoadFont("./Assets/Fonts/Arial.ttf", 64);
+
+	std::vector<Text::Layer> style = {
+		{ glm::vec4(0.f, 0.f, 0.f, 1.f), 1.f / 32.f, .5f, Transform(glm::vec3(-5.f, -5.f, 0.f)) },
+		{ glm::vec4(1.f, 0.f, 0.f, 1.f), 1.f / 3.f, .3f,  Transform() },
+		{ glm::vec4(1.f, 0.f, 0.f, 1.f), 1.f / 32.f, .4f, Transform() },
+		{ glm::vec4(1.f, 1.f, 1.f, 1.f), 1.f / 32.f, .5f, Transform() },
+	};
+
+	Text hwText(device, textRenderer, font, "Hello world!", Text::Anchor::CENTERED, style,
+		Transform());
 
 	// Create the ECS
 	ECS ecs;
@@ -169,14 +180,19 @@ int main(int argc, char** argv)
 		ecs.UpdateSystems(renderingPipeline, deltaTime);
 
 		gameRenderContext.Flush();
+	
+		style[1].color.a = abs(sin(Timing::GetTime() * 2));
+		hwText.SetStyle(style);
 
-		// Draw shadow first
-		textRenderer.RenderText(fontLarge, "Hello world!",
-			WIDTH/2 + 2.5, HEIGHT/2 - 2.5, 1.0f, glm::vec3(0.25f, 0.25f, 0.25f), true);
-			
-		textRenderer.RenderText(fontLarge, "Hello world!",
-			WIDTH/2, HEIGHT/2, 1.0f, glm::vec3(1.0f, 1.0f, 1.0f), true);
+		Transform textTransform;
+		textTransform.SetPosition(glm::vec3(WIDTH / 2, HEIGHT / 2, 0));
+		textTransform.SetRotation(glm::vec3(0.f, 0.f, sin(Timing::GetTime()) * 5.f));
+		textTransform.SetScale(glm::vec3(-abs(sin(Timing::GetTime() * 3)) / 6 + 1.8));
+		hwText.SetTransform(textTransform);
 
+		hwText.SetText("Hello world " + std::to_string((int)Timing::GetTime()));
+
+		textRenderer.RenderText(hwText);
 
 		// Swap buffers
 		window.Present();
