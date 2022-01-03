@@ -14,10 +14,10 @@ public:
 	 * @param fileName File path to the texture.
 	 */
 	Texture(RenderDevice& device, const ArrayBitmap& textureData,
-		RenderDevice::PixelFormat internalPixelFomat, bool generateMipmaps, bool shouldCompress);
+		RenderDevice::PixelFormat internalPixelFormat, bool generateMipmaps, bool shouldCompress);
 	
 	Texture(RenderDevice& device, const std::string& fileName,
-		RenderDevice::PixelFormat internalPixelFomat, bool generateMipmaps, bool shouldCompress);
+		RenderDevice::PixelFormat internalPixelFormat, bool generateMipmaps, bool shouldCompress);
 
 	virtual ~Texture();
 
