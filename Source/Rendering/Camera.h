@@ -19,8 +19,9 @@ public:
 	 * @param position The initial position of the camera.
 	 * @param rotation The initial rotation of the camera. Defaults to zero.
 	 */
-	Camera(float fov, float aspect, float zNear, float zFar, 
-		const glm::vec3& position, const glm::vec3& rotation = glm::vec3(0.0f))
+	Camera(float fov, float aspect, float zNear, float zFar, const glm::vec3& position, 
+		const glm::vec3& rotation = glm::vec3(0.0f)) : fov(fov), aspect(aspect), zNear(zNear),
+		zFar(zFar)
 	{
 		this->position = position;
 		this->rotation = rotation;
@@ -59,12 +60,35 @@ public:
 	inline void SetRotation(const glm::vec3& rotation) { this->rotation = rotation; }
 	inline glm::vec3& GetRotation() { return rotation; }
 
-protected:
+	inline void SetFOV(float fov)
+	{
+		perspective = glm::perspective(fov, aspect, zNear, zFar);
+		this->fov = fov;
+	}
+
+	inline void SetAspect(float aspect)
+	{
+		perspective = glm::perspective(fov, aspect, zNear, zFar);
+		this->aspect = aspect;
+	}
+
+	inline void SetClippingPlane(float zNear, float zFar)
+	{
+		perspective = glm::perspective(fov, aspect, zNear, zFar);
+		this->zNear = zNear;
+		this->zFar = zFar;
+	}
+
 private:
 	glm::mat4 perspective;
 	glm::vec3 position;
 	glm::vec3 rotation;
 	glm::vec3 forward;
 	glm::vec3 up;
+
+	float fov;
+	float aspect;
+	float zNear;
+	float zFar;
 };
 

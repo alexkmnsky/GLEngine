@@ -58,8 +58,9 @@ void SDLApplication::ProcessMessages(float deltaTime, IApplicationEventHandler& 
 		case SDL_MOUSEMOTION:
 			eventHandler.OnMouseMove(e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel);
 			break;
-		case SDL_WINDOWEVENT_RESIZED:
-			eventHandler.OnWindowResized(e.window.data1, e.window.data2);
+		case SDL_WINDOWEVENT:
+			if (e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
+				eventHandler.OnWindowResized(e.window.data1, e.window.data2);
 			break;
 		case SDL_QUIT:
 			isRunning = false;

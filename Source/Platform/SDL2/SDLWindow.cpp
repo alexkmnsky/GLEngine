@@ -22,7 +22,8 @@ SDLWindow::~SDLWindow()
 
 void SDLWindow::ChangeSize(unsigned int width, unsigned int height)
 {
-	// TODO: Implement
+	this->width = width;
+	this->height = height;
 }
 
 void SDLWindow::Present()

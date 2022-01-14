@@ -113,6 +113,7 @@ unsigned int OpenGLRenderDevice::CreateRenderTarget(unsigned int texture, unsign
 	unsigned int height, FramebufferAttachment attachment, unsigned int attachmentNumber, 
 	unsigned int mipLevel)
 {
+	// Create a framebuffer object (FBO)
 	unsigned int fbo;
 	glGenBuffers(1, &fbo);
 	SetFBO(fbo);
@@ -126,6 +127,13 @@ unsigned int OpenGLRenderDevice::CreateRenderTarget(unsigned int texture, unsign
 	fboMap[fbo] = data;
 
 	return fbo;
+}
+
+void OpenGLRenderDevice::UpdateRenderTarget(unsigned int fbo, unsigned int width, 
+	unsigned int height)
+{
+	fboMap[0].width = width;
+	fboMap[0].height = height;
 }
 
 unsigned int OpenGLRenderDevice::ReleaseRenderTarget(unsigned int fbo)
@@ -667,65 +675,88 @@ void OpenGLRenderDevice::SetDrawParameters(const OpenGLRenderDevice::DrawParamet
 
 void OpenGLRenderDevice::SetFBO(unsigned int fbo)
 {
+	// If the specified framebuffer object (FBO) is already bound, no change is needed.
 	if (fbo == boundFBO)
 	{
 		return;
 	}
 
+	// Bind the FBO and save the currently bound FBO. We can reduce glBindFramebuffer calls by
+	// checking what the currently bound FBO is and avoid binding the same FBO repeatedly.
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	boundFBO = fbo;
 }
 
 void OpenGLRenderDevice::SetViewport(unsigned int fbo)
 {
-	if (fbo == viewportFBO)
+	const FBOData& fboData = fboMap[fbo];
+
+	// If the viewport is already using the specified framebuffer object (FBO), and the viewport
+	// size does not need to be updated, no change is needed.
+	if (fbo == viewportFBO && fboData.width == viewportWidth && fboData.height == viewportHeight)
 	{
 		return;
 	}
-	glViewport(0, 0, fboMap[fbo].width, fboMap[fbo].height);
+
+	glViewport(0, 0, fboData.width, fboData.height);
 	viewportFBO = fbo;
+	viewportWidth = fboData.width;
+	viewportHeight = fboData.height;
 }
 
 void OpenGLRenderDevice::SetVAO(unsigned int vao)
 {
+	// If the specified vertex array object (VAO) is already bound, no change is needed.
 	if (vao == boundVAO)
 	{
 		return;
 	}
+
+	// Bind the VAO and save the currently bound VAO. We can reduce glBindVertexArray calls by
+	// checking what the currently bound VAO is and avoid binding the same VAO repeatedly.
 	glBindVertexArray(vao);
 	boundVAO = vao;
 }
 
 void OpenGLRenderDevice::SetShader(unsigned int shader)
 {
+	// If the specified shader is already bound, no change is needed.
 	if (shader == boundShader)
 	{
 		return;
 	}
+
+	// Bind the shader and save the currently bound shader. We can reduce glUseProgram calls by
+	// checking what the currently bound shader is and avoid binding the same shader repeatedly.
 	glUseProgram(shader);
 	boundShader = shader;
 }
 
 void OpenGLRenderDevice::SetFaceCulling(FaceCulling faceCulling)
 {
+	// If the specified face culling setting is already set, no change is needed.
 	if (faceCulling == currentFaceCulling)
 	{
 		return;
 	}
 
+	// Face culling is enabled, but needs to be disabled...
 	if (faceCulling == FACE_CULL_NONE)
-	{ // Face culling is enabled, but needs to be disabled
+	{ 
 		glDisable(GL_CULL_FACE);
 	}
+	// Face culling is disabled but needs to be enabled...
 	else if (currentFaceCulling == FACE_CULL_NONE)
-	{ // Face culling is disabled but needs to be enabled
+	{ 
 		glEnable(GL_CULL_FACE);
 		glCullFace(faceCulling);
 	}
+	// Only need to change culling state...
 	else
-	{ // Only need to change culling state
+	{
 		glCullFace(faceCulling);
 	}
+
 	currentFaceCulling = faceCulling;
 }
 
@@ -737,11 +768,14 @@ void OpenGLRenderDevice::SetDepthTest(bool shouldWrite, DrawFunc depthFunc)
 		shouldWriteDepth = shouldWrite;
 	}
 
+	// If the specified depth test function is already set, no change is needed.
 	if (depthFunc == currentDepthFunc)
 	{
 		return;
 	}
 
+	// Set the depth test function and save it. We can reduce glDepthFunc calls by checking what the 
+	// currently set depth test function is.
 	glDepthFunc(depthFunc);
 	currentDepthFunc = depthFunc;
 }

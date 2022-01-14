@@ -23,13 +23,14 @@ public:
 
 	/**
 	 * Initializes the text renderer and all used libraries.
-	 * 
-	 * @param width The window width in pixels.
-	 * @param height The window height in pixels.
-	 * @param shader Reference to the text shader which defines how characters are rendered.
 	 */
-	TextRenderer(int width, int height, RenderDevice& device, RenderTarget& target, Shader& shader, 
-		Sampler& sampler);
+	TextRenderer(unsigned int width, unsigned int height, RenderDevice& device, 
+		RenderTarget& target, Shader& shader, Sampler& sampler);
+
+	inline void UpdateSize(unsigned int width, unsigned int height)
+	{
+		projection = glm::ortho(0.0f, (float)width, 0.0f, (float)height);
+	}
 
 	/**
 	 * Loads a font file and prepares the first 128 characters for rendering. Currently, only

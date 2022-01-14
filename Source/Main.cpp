@@ -28,8 +28,8 @@
 
 
 // Window size
-#define WIDTH 640
-#define HEIGHT 640
+#define DEFAULT_WIDTH 640
+#define DEFAULT_HEIGHT 640
 
 /**
  * @brief System which updates the position of the entity according to the state of the motion
@@ -62,7 +62,7 @@ private:
 int main(int argc, char** argv)
 {
 	Application* application = Application::Create();
-	Window window(*application, WIDTH, HEIGHT, "GLEngine");
+	Window window(*application, DEFAULT_WIDTH, DEFAULT_HEIGHT, "GLEngine");
 	RenderDevice device(window);
 	Sampler sampler(device);
 
@@ -70,7 +70,8 @@ int main(int argc, char** argv)
 	Shader shaderText(device, "./Assets/Shaders/TextShader.glsl");
 
 	// Create a camera used for rendering
-	Camera camera(70.0f, (float)WIDTH / (float)HEIGHT, 0.1f, 1000.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+	Camera camera(70.0f, (float)window.GetWidth() / (float)window.GetHeight(), 0.1f, 1000.0f, 
+		glm::vec3(0.0f, 0.0f, 1.0f));
 
 	RenderDevice::DrawParameters drawParameters;
 	drawParameters.primitiveType = RenderDevice::PRIMITIVE_TRIANGLES;
@@ -88,7 +89,8 @@ int main(int argc, char** argv)
 	Texture textureFlag(device, "./Assets/Textures/Flag.png",RenderDevice::FORMAT_RGBA,false,false);
 
 	// Create the text renderer and load fonts used
-	TextRenderer textRenderer(WIDTH, HEIGHT, device, target, shaderText, sampler);
+	TextRenderer textRenderer((float)window.GetWidth(), (float)window.GetHeight(), device, target, 
+		shaderText, sampler);
 
 	Font* font = textRenderer.LoadFont("./Assets/Fonts/Arial.ttf", 64);
 
@@ -129,6 +131,18 @@ int main(int argc, char** argv)
 	eventHandler.AddKeyAxisControl(Keycode::KEY_DOWN, yControl, -100.f);
 	eventHandler.AddKeyAxisControl(Keycode::KEY_LEFT, xControl, -100.f);
 	eventHandler.AddKeyAxisControl(Keycode::KEY_RIGHT, xControl, 100.f);
+
+	eventHandler.AddWindowResizeCallback(
+		[&window, &target, &camera, &textRenderer](unsigned int width, unsigned int height)
+		{
+			std::cout << "Window was resized to " << width << " " << height << std::endl;
+			
+			window.ChangeSize(width, height);
+			target.UpdateSize(width, height);
+			camera.SetAspect((float)width / (float)height);
+			textRenderer.UpdateSize(width, height);
+		}
+	);
 
 	// Create components
 	TransformComponent transformComponent;
@@ -201,7 +215,7 @@ int main(int argc, char** argv)
 		hwText.SetStyle(style);
 
 		Transform textTransform;
-		textTransform.SetPosition(glm::vec3(WIDTH / 2, HEIGHT / 2, 0));
+		textTransform.SetPosition(glm::vec3(window.GetWidth() / 2.f, window.GetHeight() / 2.f, 0));
 		textTransform.SetRotation(glm::vec3(0.f, 0.f, sin(Timing::GetTime()) * 5.f));
 		textTransform.SetScale(glm::vec3(-abs(sin(Timing::GetTime() * 3)) / 6 + 1.8));
 		hwText.SetTransform(textTransform);

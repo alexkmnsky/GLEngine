@@ -2,9 +2,9 @@
 
 #include <GLM/gtc/type_ptr.hpp>
 
-TextRenderer::TextRenderer(int width, int height, RenderDevice& device, RenderTarget& target,
-	Shader& shader, Sampler& sampler) : device(&device), target(&target), shader(shader),
-	sampler(sampler)
+TextRenderer::TextRenderer(unsigned int width, unsigned int height, RenderDevice& device, 
+	RenderTarget& target, Shader& shader, Sampler& sampler) : device(&device), target(&target), 
+	shader(shader),	sampler(sampler)
 {
 	if (FT_Init_FreeType(&ft))
 	{

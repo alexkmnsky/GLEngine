@@ -36,6 +36,11 @@ public:
 		deviceID = device->ReleaseRenderTarget(deviceID);
 	}
 
+	inline void UpdateSize(unsigned int width, unsigned int height)
+	{
+		device->UpdateRenderTarget(deviceID, width, height);
+	}
+
 	inline void CheckCompressed(const Texture& texture)
 	{
 		if (texture.IsCompressed())

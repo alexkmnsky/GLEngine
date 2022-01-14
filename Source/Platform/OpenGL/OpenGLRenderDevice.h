@@ -157,6 +157,7 @@ public:
 
 	unsigned int CreateRenderTarget(unsigned int texture, unsigned int width, unsigned int height,
 		FramebufferAttachment attachment, unsigned int attachmentNumber, unsigned int mipLevel);
+	void UpdateRenderTarget(unsigned int fbo, unsigned int width, unsigned int height);
 	unsigned int ReleaseRenderTarget(unsigned int fbo);
 
 	unsigned int CreateVertexArray(const float** vertexData, const unsigned int* vertexElementSizes,
@@ -260,6 +261,8 @@ private:
 
 	unsigned int boundFBO;
 	unsigned int viewportFBO;
+	unsigned int viewportWidth;
+	unsigned int viewportHeight;
 	unsigned int boundVAO;
 	unsigned int boundShader;
 	FaceCulling currentFaceCulling;

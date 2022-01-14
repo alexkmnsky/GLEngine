@@ -17,6 +17,15 @@ public:
 
 	inline WindowHandle GetWindowHandle() { return window; }
 
+	/**
+	 * Sets the width and height for future retrieval. 
+	 * Note: this function does not change the window size. It only updates the width and height. 
+	 * 
+	 * TODO: Add support for setting the window size.
+	 * 
+	 * @param width: New window width, which should reflect the current state.
+	 * @param height: New window height, which should reflect the current state.
+	 */
 	void ChangeSize(unsigned int width, unsigned int height);
 	void Present();
 

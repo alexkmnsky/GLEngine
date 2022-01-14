@@ -1,5 +1,7 @@
 #include "GameEventHandler.h"
 
+#include <iostream>
+
 void GameEventHandler::Update()
 {
 	for (std::pair<float, MotionControl*>& motionControl : motionControls)
@@ -109,6 +111,10 @@ void GameEventHandler::OnMouseMove(unsigned int mousePositionX, unsigned int mou
 
 void GameEventHandler::OnWindowResized(unsigned int windowWidth, unsigned int windowHeight)
 {
+	for (std::function<void(unsigned int, unsigned int)> callback : windowResizedCallbacks)
+	{
+		callback(windowWidth, windowHeight);
+	}
 }
 
 void GameEventHandler::AddKeyAxisControl(unsigned int keyCode, AxisControl& control, float weight)
@@ -145,4 +151,9 @@ void GameEventHandler::AddButtonBinaryControl(unsigned int mouseButton, BinaryCo
 void GameEventHandler::AddMouseMotionControl(MotionControl& control, float weight)
 {
 	motionControls.push_back(std::make_pair(weight, &control));
+}
+
+void GameEventHandler::AddWindowResizeCallback(std::function<void(unsigned int, unsigned int)> callback)
+{
+	windowResizedCallbacks.push_back(callback);
 }

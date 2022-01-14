@@ -5,12 +5,14 @@
 #include "Events/AxisControl.h"
 #include "Events/BinaryControl.h"
 #include "Events/MotionControl.h"
+#include "Events/MotionControl.h"
 
 #include <unordered_map>
 #include <set>
 #include <vector>
 #include <utility> // std::pair
 #include <tuple>
+#include <functional>
 
 class GameEventHandler : public IApplicationEventHandler
 {
@@ -37,6 +39,8 @@ public:
 
 	void AddMouseMotionControl(MotionControl& control, float weight = 1.0f);
 
+	void AddWindowResizeCallback(std::function<void(unsigned int, unsigned int)> callback);
+
 private:
 	// Disallow copy and assign
 	GameEventHandler(const GameEventHandler& other) = delete;
@@ -52,4 +56,6 @@ private:
 	std::unordered_map<unsigned int, Controls> keyControls;
 	std::unordered_map<unsigned int, Controls> buttonControls;
 	std::vector<std::pair<float, MotionControl*>> motionControls;
+
+	std::vector<std::function<void(unsigned int, unsigned int)>> windowResizedCallbacks;
 };
