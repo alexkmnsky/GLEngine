@@ -17,6 +17,7 @@
 #include "Rendering/TextRenderer.h"
 #include "Rendering/Text.h"
 #include "Timing.h"
+#include "Events/Keycode.h"
 
 #include "GameComponentSystem/TransformComponent.h"
 #include "GameComponentSystem/ColliderComponent.h"
@@ -120,14 +121,14 @@ int main(int argc, char** argv)
 	AxisControl yControl;
 	MotionControl motionControl;
 	eventHandler.AddMouseMotionControl(motionControl);
-	eventHandler.AddKeyAxisControl(SDL_SCANCODE_W, yControl, 100.f);
-	eventHandler.AddKeyAxisControl(SDL_SCANCODE_S, yControl, -100.f);
-	eventHandler.AddKeyAxisControl(SDL_SCANCODE_A, xControl, -100.f);
-	eventHandler.AddKeyAxisControl(SDL_SCANCODE_D, xControl, 100.f);
-	eventHandler.AddKeyAxisControl(SDL_SCANCODE_UP, yControl, 100.f);
-	eventHandler.AddKeyAxisControl(SDL_SCANCODE_DOWN, yControl, -100.f);
-	eventHandler.AddKeyAxisControl(SDL_SCANCODE_LEFT, xControl, -100.f);
-	eventHandler.AddKeyAxisControl(SDL_SCANCODE_RIGHT, xControl, 100.f);
+	eventHandler.AddKeyAxisControl(Keycode::KEY_W, yControl, 100.f);
+	eventHandler.AddKeyAxisControl(Keycode::KEY_S, yControl, -100.f);
+	eventHandler.AddKeyAxisControl(Keycode::KEY_A, xControl, -100.f);
+	eventHandler.AddKeyAxisControl(Keycode::KEY_D, xControl, 100.f);
+	eventHandler.AddKeyAxisControl(Keycode::KEY_UP, yControl, 100.f);
+	eventHandler.AddKeyAxisControl(Keycode::KEY_DOWN, yControl, -100.f);
+	eventHandler.AddKeyAxisControl(Keycode::KEY_LEFT, xControl, -100.f);
+	eventHandler.AddKeyAxisControl(Keycode::KEY_RIGHT, xControl, 100.f);
 
 	// Create components
 	TransformComponent transformComponent;

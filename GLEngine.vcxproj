@@ -172,6 +172,7 @@
     <ClInclude Include="Source\Events\AxisControl.h" />
     <ClInclude Include="Source\Events\BinaryControl.h" />
     <ClInclude Include="Source\Events\IApplicationEventHandler.h" />
+    <ClInclude Include="Source\Events\Keycode.h" />
     <ClInclude Include="Source\Events\MotionControl.h" />
     <ClInclude Include="Source\GameComponentSystem\CameraComponentSystem.h" />
     <ClInclude Include="Source\GameComponentSystem\ColliderComponent.h" />
@@ -185,6 +186,7 @@
     <ClInclude Include="Source\MotionIntegrators.h" />
     <ClInclude Include="Source\Platform\OpenGL\OpenGLRenderDevice.h" />
     <ClInclude Include="Source\Platform\SDL2\SDLApplication.h" />
+    <ClInclude Include="Source\Platform\SDL2\SDLKeycode.h" />
     <ClInclude Include="Source\Platform\SDL2\SDLTiming.h" />
     <ClInclude Include="Source\Platform\SDL2\SDLWindow.h" />
     <ClInclude Include="Source\Rendering\ArrayBitmap.h" />

@@ -196,5 +196,11 @@
     <ClInclude Include="Source\Events\MotionControl.h">
       <Filter>Events</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Platform\SDL2\SDLKeycode.h">
+      <Filter>Platform\SDL2</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Events\Keycode.h">
+      <Filter>Events</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
