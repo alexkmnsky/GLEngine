@@ -12,7 +12,7 @@ SDLWindow::SDLWindow(const Application& application, unsigned int width, unsigne
 	}
 
 	window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		width, height, SDL_WINDOW_OPENGL);
+		width, height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
 }
 
 SDLWindow::~SDLWindow()

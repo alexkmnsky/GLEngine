@@ -2,28 +2,28 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="ECS">
-      <UniqueIdentifier>{20a5b203-d50d-4bf5-b0f7-553e8fdb604e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Events">
-      <UniqueIdentifier>{d3154610-3d02-4c12-9c7c-03036e4b7f39}</UniqueIdentifier>
+      <UniqueIdentifier>{4afc80b3-cc7f-4981-b189-9823de45b9f3}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering">
-      <UniqueIdentifier>{6c1c9da8-1b70-4c6a-89f9-d59ce43e31f8}</UniqueIdentifier>
+      <UniqueIdentifier>{359e46ff-5814-4dbc-ab41-d853f9461c8e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Platform\SDL2">
-      <UniqueIdentifier>{edeee116-e34e-4bc0-9503-2a10d2a89904}</UniqueIdentifier>
+      <UniqueIdentifier>{6b61fa0a-e86c-4172-b6f0-041de5f839cb}</UniqueIdentifier>
     </Filter>
     <Filter Include="Platform">
-      <UniqueIdentifier>{a8a779b7-8056-4266-a66e-68febf2650f6}</UniqueIdentifier>
+      <UniqueIdentifier>{2db7549a-7f1a-46f8-8370-b10a0e702fc9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Platform\OpenGL">
-      <UniqueIdentifier>{8e6b05f6-cd7d-4710-9025-732c9a00e2a5}</UniqueIdentifier>
+      <UniqueIdentifier>{da2e58c2-03c1-459d-9f6b-e312b9c40ab7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events">
+      <UniqueIdentifier>{93aeec2b-a582-4ebc-b899-565aec9b4980}</UniqueIdentifier>
     </Filter>
     <Filter Include="GameComponentSystem">
-      <UniqueIdentifier>{515e4400-8b36-46f9-a9b5-aa861cf041da}</UniqueIdentifier>
+      <UniqueIdentifier>{1a7042ad-c7ae-4d34-a007-772f693e0a34}</UniqueIdentifier>
     </Filter>
     <Filter Include="ThirdParty">
-      <UniqueIdentifier>{2427e8ac-cae2-4052-b20a-7cd6fb4cdef3}</UniqueIdentifier>
+      <UniqueIdentifier>{c74bdfea-9768-4c85-8b15-8fac67d04f57}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -35,9 +35,6 @@
     </ClCompile>
     <ClCompile Include="Source\ECS\ECSSystem.cpp">
       <Filter>ECS</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Events\GameEventHandler.cpp">
-      <Filter>Events</Filter>
     </ClCompile>
     <ClCompile Include="Source\Rendering\ArrayBitmap.cpp">
       <Filter>Rendering</Filter>
@@ -54,10 +51,16 @@
     <ClCompile Include="Source\Rendering\Shader.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Rendering\Text.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
     <ClCompile Include="Source\Rendering\TextRenderer.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="Source\Rendering\Texture.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Rendering\TexturePacker.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="Source\Platform\SDL2\SDLApplication.cpp">
@@ -73,15 +76,10 @@
       <Filter>Platform\OpenGL</Filter>
     </ClCompile>
     <ClCompile Include="Source\AABB.cpp" />
+    <ClCompile Include="Source\GameEventHandler.cpp" />
     <ClCompile Include="Source\GameRenderContext.cpp" />
     <ClCompile Include="Source\InteractionWorld.cpp" />
     <ClCompile Include="Source\Main.cpp" />
-    <ClCompile Include="Source\Rendering\TexturePacker.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Rendering\Text.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\ECS\ECS.h">
@@ -92,18 +90,6 @@
     </ClInclude>
     <ClInclude Include="Source\ECS\ECSSystem.h">
       <Filter>ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Events\GameEventHandler.h">
-      <Filter>Events</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Events\IApplicationEventHandler.h">
-      <Filter>Events</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Events\InputControl.h">
-      <Filter>Events</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Events\MotionControl.h">
-      <Filter>Events</Filter>
     </ClInclude>
     <ClInclude Include="Source\Rendering\ArrayBitmap.h">
       <Filter>Rendering</Filter>
@@ -135,10 +121,16 @@
     <ClInclude Include="Source\Rendering\Shader.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Rendering\Text.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Rendering\TextRenderer.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Source\Rendering\Texture.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Rendering\TexturePacker.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Source\Rendering\UniformBuffer.h">
@@ -159,6 +151,9 @@
     <ClInclude Include="Source\Platform\OpenGL\OpenGLRenderDevice.h">
       <Filter>Platform\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Events\IApplicationEventHandler.h">
+      <Filter>Events</Filter>
+    </ClInclude>
     <ClInclude Include="Source\GameComponentSystem\CameraComponentSystem.h">
       <Filter>GameComponentSystem</Filter>
     </ClInclude>
@@ -168,7 +163,7 @@
     <ClInclude Include="Source\GameComponentSystem\MotionComponentSystem.h">
       <Filter>GameComponentSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameComponentSystem\MovementControlComponentSystem.h">
+    <ClInclude Include="Source\GameComponentSystem\RotControlComponent.h">
       <Filter>GameComponentSystem</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameComponentSystem\RenderableMeshComponentSystem.h">
@@ -182,17 +177,24 @@
     </ClInclude>
     <ClInclude Include="Source\AABB.h" />
     <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\GameEventHandler.h" />
     <ClInclude Include="Source\GameRenderContext.h" />
     <ClInclude Include="Source\InteractionWorld.h" />
     <ClInclude Include="Source\MotionIntegrators.h" />
     <ClInclude Include="Source\Timing.h" />
     <ClInclude Include="Source\Transform.h" />
     <ClInclude Include="Source\Window.h" />
-    <ClInclude Include="Source\Rendering\TexturePacker.h">
-      <Filter>Rendering</Filter>
+    <ClInclude Include="Source\Events\ActionControl.h">
+      <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Rendering\Text.h">
-      <Filter>Rendering</Filter>
+    <ClInclude Include="Source\Events\AxisControl.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Events\BinaryControl.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Events\MotionControl.h">
+      <Filter>Events</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

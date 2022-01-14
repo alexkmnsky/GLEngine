@@ -11,7 +11,7 @@
 #include "Transform.h"
 #include "Rendering/Camera.h"
 #include "Application.h"
-#include "Events/GameEventHandler.h"
+#include "GameEventHandler.h"
 #include "GameRenderContext.h"
 #include "InteractionWorld.h"
 #include "Rendering/TextRenderer.h"
@@ -20,15 +20,15 @@
 
 #include "GameComponentSystem/TransformComponent.h"
 #include "GameComponentSystem/ColliderComponent.h"
-#include "GameComponentSystem/MovementControlComponentSystem.h"
+#include "GameComponentSystem/RotControlComponent.h"
 #include "GameComponentSystem/RenderableMeshComponentSystem.h"
 #include "GameComponentSystem/MotionComponentSystem.h"
 #include "GameComponentSystem/CameraComponentSystem.h"
 
 
 // Window size
-#define WIDTH 1280
-#define HEIGHT 720
+#define WIDTH 640
+#define HEIGHT 640
 
 /**
  * @brief System which updates the position of the entity according to the state of the motion
@@ -116,10 +116,23 @@ int main(int argc, char** argv)
 	// Create the event handler for responding to window events
 	GameEventHandler eventHandler;
 
+	AxisControl xControl;
+	AxisControl yControl;
+	MotionControl motionControl;
+	eventHandler.AddMouseMotionControl(motionControl);
+	eventHandler.AddKeyAxisControl(SDL_SCANCODE_W, yControl, 100.f);
+	eventHandler.AddKeyAxisControl(SDL_SCANCODE_S, yControl, -100.f);
+	eventHandler.AddKeyAxisControl(SDL_SCANCODE_A, xControl, -100.f);
+	eventHandler.AddKeyAxisControl(SDL_SCANCODE_D, xControl, 100.f);
+	eventHandler.AddKeyAxisControl(SDL_SCANCODE_UP, yControl, 100.f);
+	eventHandler.AddKeyAxisControl(SDL_SCANCODE_DOWN, yControl, -100.f);
+	eventHandler.AddKeyAxisControl(SDL_SCANCODE_LEFT, xControl, -100.f);
+	eventHandler.AddKeyAxisControl(SDL_SCANCODE_RIGHT, xControl, 100.f);
+
 	// Create components
 	TransformComponent transformComponent;
 	ColliderComponent colliderComponent;
-	MovementControlComponent movementControlComponent;
+	RotControlComponent rotControlComponent;
 	MotionComponent motionComponent;
 	CameraComponent cameraComponent;
 	RenderableMeshComponent renderableMeshComponent;
@@ -133,24 +146,26 @@ int main(int argc, char** argv)
 	cameraComponent.camera = &camera;
 	cameraComponent.offset = Transform(glm::vec3(0.0f, 0.0f, 3.0f), glm::vec3(0.0f, 0.0f, 0.0f));
 
+	rotControlComponent.x = &xControl;
+	rotControlComponent.y = &yControl;
+	rotControlComponent.motion = &motionControl;
+
 	// Set mesh and texture for the flag
 	renderableMeshComponent.mesh = &vertexArray;
 	renderableMeshComponent.texture = &textureFlag;
 
 	// Finally, create the player!
-	ecs.MakeEntity(transformComponent, renderableMeshComponent, motionComponent);
+	ecs.MakeEntity(transformComponent, renderableMeshComponent, rotControlComponent);
 
 	// Create systems
-	MovementControlSystem movementControlSystem;
+	RotControlSystem rotControlSystem;
 	MotionSystem motionSystem;
 	CameraSystem cameraSystem;
-	SpinningSystem spinningSystem;
 	RenderableMeshSystem renderableMeshSystem(gameRenderContext);
 
-	mainSystems.AddSystem(movementControlSystem);
+	mainSystems.AddSystem(rotControlSystem);
 	mainSystems.AddSystem(motionSystem);
 	mainSystems.AddSystem(cameraSystem);
-	mainSystems.AddSystem(spinningSystem);
 	renderingPipeline.AddSystem(renderableMeshSystem);
 
 	// Time values used for calculating delta time

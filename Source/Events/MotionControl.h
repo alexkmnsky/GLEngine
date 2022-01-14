@@ -1,24 +1,16 @@
 #pragma once
 
-/** @brief Used for storing the delta mouse motion along a single axis. */
+#include <GLM/glm.hpp>
+
 class MotionControl
 {
 public:
-	MotionControl()
-	{
-		amount = 0.0f;
-	}
-
-	enum class Axis
-	{
-		X,
-		Y
-	};
-
-	inline void AddAmount(float amount) { this->amount += amount; }
-	inline void ResetAmount() { this->amount = 0; }
-	inline float GetAmount() { return amount; }
+	inline void Add(glm::ivec2 delta) { this->delta += delta; }
+	inline void Add(int x, int y) { delta += glm::ivec2(x, y); }	
+	inline void Set(glm::ivec2 delta) { this->delta = delta; }
+	inline void Set(int x, int y) { delta = glm::ivec2(x, y); }
+	inline glm::ivec2 Get() { return delta; }
 
 private:
-	float amount;
+	glm::ivec2 delta;
 };

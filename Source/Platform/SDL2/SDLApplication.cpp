@@ -35,6 +35,8 @@ SDLApplication::~SDLApplication()
 
 void SDLApplication::ProcessMessages(float deltaTime, IApplicationEventHandler& eventHandler)
 {
+	eventHandler.Update();
+
 	SDL_Event e;
 	
 	while (SDL_PollEvent(&e))
@@ -55,6 +57,9 @@ void SDLApplication::ProcessMessages(float deltaTime, IApplicationEventHandler& 
 			break;
 		case SDL_MOUSEMOTION:
 			eventHandler.OnMouseMove(e.motion.x, e.motion.y, e.motion.xrel, e.motion.yrel);
+			break;
+		case SDL_WINDOWEVENT_RESIZED:
+			eventHandler.OnWindowResized(e.window.data1, e.window.data2);
 			break;
 		case SDL_QUIT:
 			isRunning = false;
