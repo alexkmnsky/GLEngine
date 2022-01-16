@@ -121,6 +121,7 @@ unsigned int OpenGLRenderDevice::CreateRenderTarget(unsigned int texture, unsign
 	GLenum attachmentTypeGL = attachment + attachmentNumber;
 	glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentTypeGL, GL_TEXTURE_2D, texture, mipLevel);
 
+	// Save framebuffer width and height
 	FBOData data;
 	data.width = width;
 	data.height = height;
@@ -132,21 +133,26 @@ unsigned int OpenGLRenderDevice::CreateRenderTarget(unsigned int texture, unsign
 void OpenGLRenderDevice::UpdateRenderTarget(unsigned int fbo, unsigned int width, 
 	unsigned int height)
 {
+	// Update the width and height of the framebuffer (viewport size set in SetViewport)
 	fboMap[0].width = width;
 	fboMap[0].height = height;
 }
 
 unsigned int OpenGLRenderDevice::ReleaseRenderTarget(unsigned int fbo)
 {
+	// Default framebuffer; should not be deleted.
 	if (fbo == 0) return 0;
 
+	// Check if the framebuffer exists...
 	std::unordered_map<unsigned int, FBOData>::iterator it = fboMap.find(fbo);
 
+	// Framebuffer could not be found; it was never created or was already deleted.
 	if (it == fboMap.end())
 	{
 		return 0;
 	}
 
+	// Delete framebuffer and associated data...
 	glDeleteFramebuffers(1, &fbo);
 	fboMap.erase(it);
 	return 0;
@@ -157,12 +163,14 @@ unsigned int OpenGLRenderDevice::CreateVertexArray(const float** vertexData,
 	unsigned int numInstanceComponents, unsigned int numVertices, const unsigned int* indices, 
 	unsigned int numIndices, BufferUsage usage)
 {
+	// Vertex Components + Instance Components + Indices
 	unsigned int numBuffers = numVertexComponents + numInstanceComponents + 1;
 
-	GLuint vao;
+	GLuint vao; // Vertex Array Object (VAO)
 	GLuint* buffers = new GLuint[numBuffers];
 	size_t* bufferSizes = new size_t[numBuffers];
 
+	// Generate 1 vertex array
 	glGenVertexArrays(1, &vao);
 	SetVAO(vao);
 
@@ -172,13 +180,16 @@ unsigned int OpenGLRenderDevice::CreateVertexArray(const float** vertexData,
 		BufferUsage attributeUsage = usage;
 		bool inInstancedMode = false;
 
+		// If this is an instance component
 		if (i >= numVertexComponents)
 		{
-			attributeUsage = USAGE_DYNAMIC_DRAW;
+			attributeUsage = USAGE_DYNAMIC_DRAW; // Instanced data will be written each frame
 			inInstancedMode = true;
 		}
 
 		unsigned int elementSize = vertexElementSizes[i];
+		// If this is an instance component, there is no data to bind as it will be updated each
+		// frame. If no vertex data was supplied, leave it empty.
 		const void* bufferData = (inInstancedMode || vertexData == nullptr) ? nullptr : vertexData[i];
 		size_t dataSize = inInstancedMode 
 			? elementSize * sizeof(float) 
@@ -195,25 +206,37 @@ unsigned int OpenGLRenderDevice::CreateVertexArray(const float** vertexData,
 		for (unsigned int j = 0; j < elementSizeDiv; j++)
 		{
 			glEnableVertexAttribArray(attribute);
+			// Specify how to interpret vertex buffer data
 			glVertexAttribPointer(attribute, 4, GL_FLOAT, GL_FALSE, elementSize * sizeof(GLfloat),
 				(const GLvoid*)(sizeof(GLfloat) * j * 4));
 
+			// If this is an instanced attribute...
 			if (inInstancedMode)
 			{
+				// Setting the attribute divisor to 1 tells OpenGL to update the content of the
+				// vertex attribute when we start to render a new instance. By default, this is set
+				// to 0 which means the contents of the vertex attribute are updated each iteration
+				// of the vertex shader.
 				glVertexAttribDivisor(attribute, 1);
 			}
 
 			attribute++;
 		}
-		if (elementSizeRem != 0)
+		if (elementSizeRem != 0) // Last remaining set of less than 4 elements
 		{
 			glEnableVertexAttribArray(attribute);
-			glVertexAttribPointer(attribute, elementSize, GL_FLOAT, GL_FALSE, 
+			// Specify how to interpret vertex buffer data
+			glVertexAttribPointer(attribute, elementSizeRem, GL_FLOAT, GL_FALSE, 
 				elementSize * sizeof(GLfloat),
 				(const GLvoid*)(sizeof(GLfloat) * elementSizeDiv * 4));
 
+			// If this is an instanced attribute...
 			if (inInstancedMode)
 			{
+				// Setting the attribute divisor to 1 tells OpenGL to update the content of the
+				// vertex attribute when we start to render a new instance. By default, this is set
+				// to 0 which means the contents of the vertex attribute are updated each iteration
+				// of the vertex shader.
 				glVertexAttribDivisor(attribute, 1);
 			}
 
@@ -221,6 +244,7 @@ unsigned int OpenGLRenderDevice::CreateVertexArray(const float** vertexData,
 		}
 	}
 
+	// Bind vertex array indices...
 	size_t indicesSize = numIndices * sizeof(unsigned int);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[numBuffers - 1]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, indices, usage);
@@ -242,18 +266,24 @@ unsigned int OpenGLRenderDevice::CreateVertexArray(const float** vertexData,
 void OpenGLRenderDevice::UpdateVertexArrayBuffer(unsigned int vao, unsigned int bufferIndex, 
 	const void* data, size_t dataSize)
 {
+	// Vertex Array Object (VAO) 0 is null. No functions that modify VAO state should be called.
 	if (vao == 0)
 	{
 		return;
 	}
 
+	// Check if the VAO exists...
 	std::unordered_map<unsigned int, VertexArray>::iterator it = vaoMap.find(vao);
+
+	// VAO could not be found; it was never created or was deleted.
 	if (it == vaoMap.end())
 	{
 		return;
 	}
+
 	const VertexArray* vaoData = &it->second;
 	BufferUsage usage;
+	// If we are modifying a per-instance component, set it to dynamic draw (hint to GPU)
 	if (bufferIndex >= vaoData->instanceComponentsStartIndex)
 	{
 		usage = USAGE_DYNAMIC_DRAW;
@@ -269,7 +299,7 @@ void OpenGLRenderDevice::UpdateVertexArrayBuffer(unsigned int vao, unsigned int 
 	{
 		glBufferSubData(GL_ARRAY_BUFFER, 0, dataSize, data);
 	}
-	else
+	else // More memory needs to be allocated for this buffer
 	{
 		glBufferData(GL_ARRAY_BUFFER, dataSize, data, usage);
 		vaoData->bufferSizes[bufferIndex] = dataSize;
@@ -278,23 +308,29 @@ void OpenGLRenderDevice::UpdateVertexArrayBuffer(unsigned int vao, unsigned int 
 
 unsigned int OpenGLRenderDevice::ReleaseVertexArray(unsigned int vao)
 {
+	// Vertex Array Object (VAO) 0 is null. No functions that modify VAO state should be called.
 	if (vao == 0)
 	{
 		return 0;
 	}
-
+	
+	// Check if the VAO exists...
 	std::unordered_map<unsigned int, VertexArray>::iterator it = vaoMap.find(vao);
+
+	// VAO could not be found; it was never created or was already deleted.
 	if (it == vaoMap.end())
 	{
 		return 0;
 	}
-	const VertexArray* vaoData = &it->second;
 
+	// Delete the VAO...
+	const VertexArray* vaoData = &it->second;
 	glDeleteVertexArrays(1, &vao);
 	glDeleteBuffers(vaoData->numBuffers, vaoData->buffers);
 	delete[] vaoData->buffers;
 	delete[] vaoData->bufferSizes;
 	vaoMap.erase(it);
+
 	return 0;
 }
 
@@ -316,10 +352,12 @@ unsigned int OpenGLRenderDevice::CreateSampler(SamplerFilter minFilter, SamplerF
 
 unsigned int OpenGLRenderDevice::ReleaseSampler(unsigned int sampler)
 {
+	// Sampler 0 is null, nothing to delete.
 	if (sampler == 0)
 	{
 		return 0;
 	}
+
 	glDeleteSamplers(1, &sampler);
 	return 0;
 }
@@ -383,12 +421,14 @@ unsigned int OpenGLRenderDevice::CreateTexture2D(int width, int height, const vo
 
 	if (packAlignment != currentPackAlignment)
 	{
+		// This specifies the alignment requirements for the start of each pixel row in memory. 
 		glPixelStorei(GL_PACK_ALIGNMENT, packAlignment);
 		currentPackAlignment = packAlignment;
 	}
 
 	if (unpackAlignment != currentUnpackAlignment)
 	{
+		// This specifies the alignment requirements for the start of each pixel row in memory. 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, unpackAlignment);
 		currentUnpackAlignment = unpackAlignment;
 	}
@@ -417,10 +457,12 @@ unsigned int OpenGLRenderDevice::CreateTexture2D(int width, int height, const vo
 
 unsigned int OpenGLRenderDevice::ReleaseTexture2D(unsigned int texture2D)
 {
+	// Texture 0 is null, nothing to delete.
 	if (texture2D == 0)
 	{
 		return 0;
 	}
+
 	glDeleteTextures(1, &texture2D);
 	return 0;
 }
@@ -445,10 +487,12 @@ void OpenGLRenderDevice::UpdateUniformBuffer(unsigned int buffer, const void* da
 
 unsigned int OpenGLRenderDevice::ReleaseUniformBuffer(unsigned int buffer)
 {
+	// Uniform buffer 0 is null, nothing to delete.
 	if (buffer == 0)
 	{
 		return 0;
 	}
+
 	glDeleteBuffers(1, &buffer);
 	return 0;
 }
@@ -457,6 +501,7 @@ unsigned int OpenGLRenderDevice::CreateShaderProgram(const std::string& shaderTe
 {
 	GLuint shaderProgram = glCreateProgram();
 
+	// Should never be 0 as shader 0 is null. Something went wrong...
 	if (shaderProgram == 0)
 	{
 		std::cerr << "Error creating shader program." << std::endl;
@@ -530,16 +575,20 @@ void OpenGLRenderDevice::SetShaderSampler(unsigned int shader, const std::string
 
 unsigned int OpenGLRenderDevice::ReleaseShaderProgram(unsigned int shader)
 {
+	// Shader program 0 is null, nothing to delete.
 	if (shader == 0) return 0;
 
+	// Check if the shader exists...
 	auto programIt = shaderProgramMap.find(shader);
 	if (programIt == shaderProgramMap.end())
 	{
+		// Shader could not be found, it was never created or was already deleted.
 		return 0;
 	}
 
 	const ShaderProgram* shaderProgram = &programIt->second;
 
+	// Delete all attached shaders
 	for (std::vector<unsigned int>::const_iterator it = shaderProgram->shaders.begin();
 		it != shaderProgram->shaders.end(); ++it)
 	{
@@ -643,10 +692,13 @@ void OpenGLRenderDevice::Clear(unsigned int fbo, bool shouldClearColor, bool sho
 void OpenGLRenderDevice::Draw(unsigned int fbo, unsigned int shader, unsigned int vao, 
 	const DrawParameters& drawParameters, unsigned int numInstances, unsigned int numElements)
 {
+	// Nothing to draw...
 	if (numInstances == 0)
 	{
 		return;
 	}
+
+	// Note: Ensure correct drawing process order
 	SetFBO(fbo);
 	SetViewport(fbo);
 	SetDrawParameters(drawParameters);
@@ -782,24 +834,30 @@ void OpenGLRenderDevice::SetDepthTest(bool shouldWrite, DrawFunc depthFunc)
 
 void OpenGLRenderDevice::SetBlending(BlendFunc sourceBlend, BlendFunc destinationBlend)
 {
+	// If the specified blend functions are already set, no change is needed.
 	if (sourceBlend == currentSourceBlend && destinationBlend == currentDestBlend)
 	{
 		return;
 	}
+	// No blending...
 	else if (sourceBlend == BLEND_FUNC_NONE || destinationBlend == BLEND_FUNC_NONE)
 	{
 		glDisable(GL_BLEND);
 	}
+	// Blending was previously disabled, but now needs to be enabled.
 	else if (currentSourceBlend == BLEND_FUNC_NONE || currentDestBlend == BLEND_FUNC_NONE)
 	{
 		glEnable(GL_BLEND);
 		glBlendFunc(sourceBlend, destinationBlend);
 	}
+	// Blending is already enabled, set the new blend functions.
 	else
 	{
 		glBlendFunc(sourceBlend, destinationBlend);
 	}
 
+	// We can reduce glDisable, glEnable, and glBlendFunc calls by checking what the currently set 
+	// blend function is and avoid setting the same blend functions repeatedly.
 	currentSourceBlend = sourceBlend;
 	currentDestBlend = destinationBlend;
 }
@@ -810,17 +868,22 @@ void OpenGLRenderDevice::SetStencilTest(bool enable, DrawFunc stencilFunc,
 {
 	if (enable != stencilTestEnabled)
 	{
+		// If we want to enable stencil testing and it is not already enabled
 		if (enable)
 		{
 			glEnable(GL_STENCIL_TEST);
 		}
+		// If we want to disable stencil testing and it is not already disabled
 		else
 		{
 			glDisable(GL_STENCIL_TEST);
 		}
+		// Avoid enabling or disabling repeatedly by saving the current state.
 		stencilTestEnabled = enable;
 	}
 
+	// Check if the currently set stencil functions match the specified stencil functions. If they
+	// already match, we do not need to repeatedly set them.
 	if (stencilFunc != currentStencilFunc || stencilTestMask != currentStencilTestMask
 		|| stencilComparisonVal != currentStencilComparisonVal)
 	{
@@ -830,6 +893,8 @@ void OpenGLRenderDevice::SetStencilTest(bool enable, DrawFunc stencilFunc,
 		currentStencilFunc = stencilFunc;
 	}
 
+	// Check if the currently set stencil test behavior matches the specified stencil test behavior. 
+	// If they already match, we do not need to repeatedly set them.
 	if (stencilFail != currentStencilFail || stencilPass != currentStencilPass
 		|| stencilPassButDepthFail != currentStencilPassButDepthFail)
 	{
@@ -844,10 +909,12 @@ void OpenGLRenderDevice::SetStencilTest(bool enable, DrawFunc stencilFunc,
 
 void OpenGLRenderDevice::SetStencilWriteMask(unsigned int mask)
 {
+	// If the stencil write mask is already set, no change is needed.
 	if (currentStencilWriteMask == mask)
 	{
 		return;
 	}
+
 	glStencilMask(mask);
 	currentStencilWriteMask = mask;
 }
@@ -855,12 +922,15 @@ void OpenGLRenderDevice::SetStencilWriteMask(unsigned int mask)
 void OpenGLRenderDevice::SetScissorTest(bool enable, unsigned int startX, unsigned int startY, 
 	unsigned int width, unsigned int height)
 {
+	// If we want to disable scissor testing
 	if (!enable)
 	{
+		// If scissor testing is already disabled, no change is needed.
 		if (!scissorTestEnabled)
 		{
 			return;
 		}
+		// Disable...
 		else
 		{
 			glDisable(GL_SCISSOR_TEST);
@@ -868,17 +938,19 @@ void OpenGLRenderDevice::SetScissorTest(bool enable, unsigned int startX, unsign
 			return;
 		}
 	}
+
 	if (!scissorTestEnabled)
 	{
 		glEnable(GL_SCISSOR_TEST);
 	}
+
 	glScissor(startX, startY, width, height);
 	scissorTestEnabled = true;
 }
 
 unsigned int OpenGLRenderDevice::GetVersion()
 {
-	if (version != 0)
+	if (version != 0) // If we already found the version
 	{
 		return version;
 	}
@@ -944,14 +1016,18 @@ bool AddShader(GLuint shaderProgram, const std::string& text, GLenum type,
 {
 	GLuint shader = glCreateShader(type);
 
+	// Should never be 0 as shader 0 is null. Something went wrong...
 	if (shader == 0)
 	{
 		std::cerr << "Error creating shader type " << type << std::endl;
 		return false;
 	}
 
+	// Convert string into GLchar*
 	const GLchar* p[1];
 	p[0] = text.c_str();
+
+	// Save string length as GLint
 	GLint lengths[1];
 	lengths[0] = (GLint)text.length();
 
@@ -962,7 +1038,7 @@ bool AddShader(GLuint shaderProgram, const std::string& text, GLenum type,
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
-		GLchar infoLog[1024];
+		GLchar infoLog[1024]; // Error message string will always be 1024 in length
 
 		glGetShaderInfoLog(shader, 1024, NULL, infoLog);
 		std::cerr << "Error compiling shader type " << shader << ": '" << infoLog << " '"
@@ -998,8 +1074,9 @@ void AddAllAttributes(GLuint program, const std::string& vertexShaderText, unsig
 		GLenum type = 0;
 		GLsizei actualLength = 0;
 
-		glGetActiveAttrib(program, attribute, nameData.size(),
-			&actualLength, &arraySize, &type, &nameData[0]);
+		glGetActiveAttrib(program, attribute, nameData.size(), &actualLength, &arraySize, &type, 
+			&nameData[0]);
+
 		glBindAttribLocation(program, attribute, (char*)&nameData[0]);
 	}
 }
@@ -1039,24 +1116,26 @@ void AddShaderUniforms(GLuint shaderProgram, const std::string& shaderText,
 	std::unordered_map<std::string, GLint>& uniformMap, 
 	std::unordered_map<std::string, GLint>& samplerMap)
 {
+	// Get the number of active uniform blocks for the program 
 	GLint numBlocks;
 	glGetProgramiv(shaderProgram, GL_ACTIVE_UNIFORM_BLOCKS, &numBlocks);
 	for (int block = 0; block < numBlocks; ++block)
 	{
-		GLint nameLen;
-		glGetActiveUniformBlockiv(shaderProgram, block,
-			GL_UNIFORM_BLOCK_NAME_LENGTH, &nameLen);
+		GLint nameLength;
+		glGetActiveUniformBlockiv(shaderProgram, block,	GL_UNIFORM_BLOCK_NAME_LENGTH, &nameLength);
 
-		std::vector<GLchar> name(nameLen);
-		glGetActiveUniformBlockName(shaderProgram, block, nameLen, NULL, &name[0]);
-		std::string uniformBlockName((char*)&name[0], nameLen - 1);
+		std::vector<GLchar> name(nameLength);
+		glGetActiveUniformBlockName(shaderProgram, block, nameLength, NULL, &name[0]);
+		std::string uniformBlockName((char*)&name[0], nameLength - 1);
+		// Save the uniform block index so that we can easily lookup the index of a given block.
 		uniformMap[uniformBlockName] = glGetUniformBlockIndex(shaderProgram, &name[0]);
 	}
 
+	// Get the number of active uniform variables for the program 
 	GLint numUniforms = 0;
 	glGetProgramiv(shaderProgram, GL_ACTIVE_UNIFORMS, &numBlocks);
 
-	// Would get GL_ACTIVE_UNIFORM_MAX_LENGTH, but buggy on some drivers
+	// Would get GL_ACTIVE_UNIFORM_MAX_LENGTH, but buggy on some drivers.
 	std::vector<GLchar> uniformName(256);
 	for (int uniform = 0; uniform < numUniforms; ++uniform)
 	{
@@ -1071,6 +1150,8 @@ void AddShaderUniforms(GLuint shaderProgram, const std::string& shaderText,
 			continue;
 		}
 		std::string name((char*)&uniformName[0], actualLength - 1);
+		// Since only sampler2D uniforms are supported, save it to our sampler map so that we can
+		// easily look up the uniform variable index of a sampler.
 		samplerMap[name] = glGetUniformLocation(shaderProgram, (char*)&uniformName[0]);
 	}
 }
