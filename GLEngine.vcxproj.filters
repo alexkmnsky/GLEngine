@@ -1,32 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="ECS">
-      <UniqueIdentifier>{4afc80b3-cc7f-4981-b189-9823de45b9f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Rendering">
-      <UniqueIdentifier>{359e46ff-5814-4dbc-ab41-d853f9461c8e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Platform\SDL2">
-      <UniqueIdentifier>{6b61fa0a-e86c-4172-b6f0-041de5f839cb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Platform">
-      <UniqueIdentifier>{2db7549a-7f1a-46f8-8370-b10a0e702fc9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Platform\OpenGL">
-      <UniqueIdentifier>{da2e58c2-03c1-459d-9f6b-e312b9c40ab7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Events">
-      <UniqueIdentifier>{93aeec2b-a582-4ebc-b899-565aec9b4980}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="GameComponentSystem">
-      <UniqueIdentifier>{1a7042ad-c7ae-4d34-a007-772f693e0a34}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ThirdParty">
-      <UniqueIdentifier>{c74bdfea-9768-4c85-8b15-8fac67d04f57}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="Source\AABB.cpp" />
+    <ClCompile Include="Source\GameEventHandler.cpp" />
+    <ClCompile Include="Source\GameRenderContext.cpp" />
+    <ClCompile Include="Source\InteractionWorld.cpp" />
+    <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\ECS\ECS.cpp">
       <Filter>ECS</Filter>
     </ClCompile>
@@ -75,13 +54,20 @@
     <ClCompile Include="Source\Platform\OpenGL\OpenGLRenderDevice.cpp">
       <Filter>Platform\OpenGL</Filter>
     </ClCompile>
-    <ClCompile Include="Source\AABB.cpp" />
-    <ClCompile Include="Source\GameEventHandler.cpp" />
-    <ClCompile Include="Source\GameRenderContext.cpp" />
-    <ClCompile Include="Source\InteractionWorld.cpp" />
-    <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Physics\PhysicsCollision.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\AABB.h" />
+    <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\GameEventHandler.h" />
+    <ClInclude Include="Source\GameRenderContext.h" />
+    <ClInclude Include="Source\InteractionWorld.h" />
+    <ClInclude Include="Source\MotionIntegrators.h" />
+    <ClInclude Include="Source\Timing.h" />
+    <ClInclude Include="Source\Transform.h" />
+    <ClInclude Include="Source\Window.h" />
     <ClInclude Include="Source\ECS\ECS.h">
       <Filter>ECS</Filter>
     </ClInclude>
@@ -142,6 +128,9 @@
     <ClInclude Include="Source\Platform\SDL2\SDLApplication.h">
       <Filter>Platform\SDL2</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Platform\SDL2\SDLKeycode.h">
+      <Filter>Platform\SDL2</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Platform\SDL2\SDLTiming.h">
       <Filter>Platform\SDL2</Filter>
     </ClInclude>
@@ -151,7 +140,22 @@
     <ClInclude Include="Source\Platform\OpenGL\OpenGLRenderDevice.h">
       <Filter>Platform\OpenGL</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Events\ActionControl.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Events\AxisControl.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Events\BinaryControl.h">
+      <Filter>Events</Filter>
+    </ClInclude>
     <ClInclude Include="Source\Events\IApplicationEventHandler.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Events\Keycode.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Events\MotionControl.h">
       <Filter>Events</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameComponentSystem\CameraComponentSystem.h">
@@ -163,7 +167,7 @@
     <ClInclude Include="Source\GameComponentSystem\MotionComponentSystem.h">
       <Filter>GameComponentSystem</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameComponentSystem\RotControlComponent.h">
+    <ClInclude Include="Source\GameComponentSystem\FreecamControlComponent.h">
       <Filter>GameComponentSystem</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameComponentSystem\RenderableMeshComponentSystem.h">
@@ -175,32 +179,67 @@
     <ClInclude Include="Source\ThirdParty\stb_image.h">
       <Filter>ThirdParty</Filter>
     </ClInclude>
-    <ClInclude Include="Source\AABB.h" />
-    <ClInclude Include="Source\Application.h" />
-    <ClInclude Include="Source\GameEventHandler.h" />
-    <ClInclude Include="Source\GameRenderContext.h" />
-    <ClInclude Include="Source\InteractionWorld.h" />
-    <ClInclude Include="Source\MotionIntegrators.h" />
-    <ClInclude Include="Source\Timing.h" />
-    <ClInclude Include="Source\Transform.h" />
-    <ClInclude Include="Source\Window.h" />
-    <ClInclude Include="Source\Events\ActionControl.h">
-      <Filter>Events</Filter>
+    <ClInclude Include="Source\Physics\Collider.h">
+      <Filter>Physics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Events\AxisControl.h">
-      <Filter>Events</Filter>
+    <ClInclude Include="Source\Physics\PhysicsCollision.h">
+      <Filter>Physics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Events\BinaryControl.h">
-      <Filter>Events</Filter>
+    <ClInclude Include="Source\Physics\PhysicsObject.h">
+      <Filter>Physics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Events\MotionControl.h">
-      <Filter>Events</Filter>
+    <ClInclude Include="Source\Physics\PlaneCollider.h">
+      <Filter>Physics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Platform\SDL2\SDLKeycode.h">
-      <Filter>Platform\SDL2</Filter>
+    <ClInclude Include="Source\Physics\SphereCollider.h">
+      <Filter>Physics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Events\Keycode.h">
-      <Filter>Events</Filter>
+    <ClInclude Include="Source\Physics\Systems\PhysicsWorldSystem.h">
+      <Filter>Physics\Systems</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Physics\Components\RigidbodyComponent.h">
+      <Filter>Physics\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Algorithm\Octree.h">
+      <Filter>Algorithm</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ECS">
+      <UniqueIdentifier>{4e523c8b-9f01-43be-a276-18414cfbb2af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering">
+      <UniqueIdentifier>{a78c9860-49b8-4a36-861b-abff1f292b1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{fa6e2cda-4950-4fbe-a80b-d0662eb7f144}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\SDL2">
+      <UniqueIdentifier>{3bb74203-e5fb-45fa-97c6-342d29de601e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\OpenGL">
+      <UniqueIdentifier>{eab74fab-aa04-4097-b753-118e186daaea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events">
+      <UniqueIdentifier>{925a6ddf-c9ac-41ff-9287-502a884bca43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameComponentSystem">
+      <UniqueIdentifier>{55b49829-35a1-46fc-bb64-8541bdd1a7a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ThirdParty">
+      <UniqueIdentifier>{a0af7c01-2bf6-4dc1-a7b3-816f1cdfc52d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{7a3db02f-2eea-4ac3-8b06-ff4cd5d85129}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics\Systems">
+      <UniqueIdentifier>{3083627e-e314-4397-a0a5-f35a0f87042a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Physics\Components">
+      <UniqueIdentifier>{ce8a92ec-842c-4bea-b93e-8e43145aedda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Algorithm">
+      <UniqueIdentifier>{e63e5214-5523-4577-9847-e1cba8242820}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

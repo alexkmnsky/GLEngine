@@ -1,4 +1,8 @@
 #include "InteractionWorld.h"
+
+#include "Algorithm/Octree.h"
+#include "Physics/PhysicsCollision.h"
+
 #include <algorithm>
 
 void InteractionWorld::OnMakeEntity(EntityHandle handle)
@@ -74,181 +78,134 @@ void InteractionWorld::ProcessInteractions(float deltaTime)
 	std::vector<BaseECSComponent*> interactorComponents;
 	std::vector<BaseECSComponent*> interacteeComponents;
 
-	// Values used to find the highest variance axis
-	glm::vec3 centerSum;
-	glm::vec3 centerSquareSum;
+	// Remove entitiesToRemove and update entitiesToUpdate
+	RemoveAndUpdateEntities();
 
-	// Perform this check three times; for each axis
-	// This is needed for the collision response, as a resolution on one axis can result in a 
-	// collision on another
-	// TODO Find a better solution for this... (this is essentially a hack)
-	for (unsigned int axis = 0; axis < 3; axis++)
+	std::vector<std::pair<EntityHandle, const AABB>> data;
+	float min =  std::numeric_limits<float>::infinity();
+	float max = -std::numeric_limits<float>::infinity();
+
+	for (const EntityInternal& entity : entities)
 	{
-		// Remove entitiesToRemove and update entitiesToUpdate
-		RemoveAndUpdateEntities();
+		// Get the collider component of the entity
+		const auto colliderComponent = ecs.GetComponent<ColliderComponent>(entity.handle);
 
-		// Iterate over all entities and update the transformed bounding box
-		for (size_t i = 0; i < entities.size(); i++)
+		const AABB transformedAABB = colliderComponent->aabb.Translate(
+			ecs.GetComponent<TransformComponent>(entity.handle)->transform.GetPosition());
+
+		data.emplace_back(entity.handle, transformedAABB);
+
+		const glm::vec3 minExtents = transformedAABB.GetMinExtents();
+		const glm::vec3 maxExtents = transformedAABB.GetMaxExtents();
+		min = std::min({ min, minExtents.x, minExtents.y, minExtents.z });
+		max = std::max({ max, maxExtents.x, maxExtents.y, maxExtents.z });
+	}
+
+	auto octree = Algorithm::Octree<EntityHandle>(AABB(glm::vec3(min), glm::vec3(max)));
+
+	for (const auto& [handle, objectBounds] : data)
+	{
+		octree.Insert(handle, objectBounds);
+	}
+
+	std::vector<Collision<EntityInternal&>> collisions;
+
+	// Go through the list of entities, test intersections in range
+	for (size_t i = 0; i < entities.size(); i++)
+	{
+		// Find intersections for this entity...
+
+		// Iterate over entities, start at i + 1
+		// As the order of the two does not matter, this will ensure that i and j will be a
+		// unique pair of entities
+
+		for (size_t j = i + 1; j < entities.size(); j++)
 		{
-			// Get the collider component of the entity
-			ColliderComponent* colliderComponent = ecs.GetComponent<ColliderComponent>(
-				entities[i].handle);
 
-			// Translate the collider AABB by the entity's translation and set it as the 
-			// transformed AABB
-			colliderComponent->transformedAABB = colliderComponent->aabb.Translate(
-				ecs.GetComponent<TransformComponent>(entities[i].handle)->transform.GetPosition());
-		}
-
-		// Sort entities by min on highest variance axis
-		std::sort(entities.begin(), entities.end(), compareAABB);
-
-		// Reset the values used for find the highest variance axis every update
-		centerSum = glm::vec3(0.0f);
-		centerSquareSum = glm::vec3(0.0f);
-
-		// Go through the list of entities, test intersections in range
-		for (size_t i = 0; i < entities.size(); i++)
-		{
-			// Get the bounding box of the entity
-			AABB aabb = ecs.GetComponent<ColliderComponent>(entities[i].handle)->transformedAABB;
-
-			// Get the center of the entity's bounding box, and add the value to centerSum, and
-			// the squared value to centerSquareSum (used for finding the highest variance axis)
-			glm::vec3 center = aabb.GetCenter();
-			centerSum += center;
-			centerSquareSum += (center * center);
-
-			// Find intersections for this entity...
-
-			// Iterate over entities, start at i + 1
-			// As the order of the two does not matter, this will ensure that i and j will be a
-			// unique pair of entities
-			for (size_t j = i + 1; j < entities.size(); j++)
+			if (!octree.AreRelated(entities[i].handle, entities[j].handle))
 			{
-				// Get the bounding box of the other entity
-				AABB otherAABB = ecs.GetComponent<ColliderComponent>(
-					entities[j].handle)->transformedAABB;
+				continue; 
+			}
 
-				// Check for overlap on the max variance axis
-				// If this is true, the bounding boxes are not colliding, and since the entities
-				// are sorted along the max variance axis, no other entities beyond this one
-				// can be intersecting with this entity
-				if (otherAABB.GetMinExtents()[compareAABB.axis] > aabb.GetMaxExtents()[compareAABB.axis])
-				{
-					// Stop checking for collisions with entity i; continue to the next entity
-					break;
-				}
+			const auto transformComponentA = ecs.GetComponent<TransformComponent>(entities[i].handle);
+			const auto transformComponentB = ecs.GetComponent<TransformComponent>(entities[j].handle);
 
-				// At this point, aabb is potentially intersecting otherAABB...
-				// Perform the test
-				if (aabb.Intersects(otherAABB))
-				{
-					size_t interactorIndex = i;
-					size_t interacteeIndex = j;
+			const auto colliderComponentA = ecs.GetComponent<ColliderComponent>(entities[i].handle);
+			const auto colliderComponentB = ecs.GetComponent<ColliderComponent>(entities[j].handle);
 
-					// If rules say so, then entities[i] interacts with entities[j]
-					// If rules say so, then entities[j] interacts with entities[i]
-					// Check if there is an interaction between the two entities...
+			Collider* colliderA;
+			Collider* colliderB;
 
-					// Repeat twice...
-					// Once where entities[i] is the interactor and entities[j] is the interactee
-					// Once where entities[j] is the interactor and entities[i] is the interactee
-					for (size_t dummyIndex = 0; dummyIndex < 2; dummyIndex++)
-					{
-						// Iterate over all interactions where the interactor has all the
-						// required component types
-						for (size_t k = 0; k < entities[interactorIndex].interactors.size(); k++)
-						{
-							// Iterate over all interactions where the interactee has all the
-							// required component types
-							for (size_t l = 0; l < entities[interacteeIndex].interactees.size(); l++)
-							{
-								unsigned int index = entities[interactorIndex].interactors[k];
+			// https://stackoverflow.com/a/53166942
+			std::visit([&colliderA](auto&& collider) { colliderA = &collider; }, colliderComponentA->collider);
+			std::visit([&colliderB](auto&& collider) { colliderB = &collider; }, colliderComponentB->collider);
 
-								// If both indices match, an interaction where the interactor has 
-								// all required component types and the interactee has all required
-								// component types has been found
-								if (index == entities[interacteeIndex].interactees[l])
-								{
-									// Get the interaction, which determines how the two entities
-									// should interact
-									Interaction* interaction = interactions[index];
+			CollisionPoints points = colliderA->TestCollision(&transformComponentA->transform,
+				colliderB, &transformComponentB->transform);
 
-									// Resize the component arrays to fit the entities' components
-									interactorComponents.resize(std::max(interactorComponents.size(),
-										interaction->GetInteractorComponents().size()));
-									interacteeComponents.resize(std::max(interacteeComponents.size(),
-										interaction->GetInteracteeComponents().size()));
-
-									// Iterate over all required component types for the interactor
-									for (size_t m = 0; m < interaction->GetInteractorComponents().size(); m++)
-									{
-										// Get the component of the type from the interactor entity
-										// Add it to the interactor components list
-										interactorComponents[m] = ecs.GetComponentByType(
-											entities[interactorIndex].handle,
-											interaction->GetInteractorComponents()[m]);
-									}
-
-									// Iterate over all required component types for the interactee
-									for (size_t m = 0; m < interaction->GetInteracteeComponents().size(); m++)
-									{
-										// Get the component of the type from the interactee entity
-										// Add it to the interactee components list
-										interacteeComponents[m] = ecs.GetComponentByType(
-											entities[interacteeIndex].handle,
-											interaction->GetInteracteeComponents()[m]);
-									}
-
-									// Pass in all relelvant data to the interaction
-									interaction->Interact(deltaTime, entities[interactorIndex].handle,
-										entities[interacteeIndex].handle, interactorComponents.data(),
-										interacteeComponents.data());
-								}
-							}
-						}
-						// Check the other possiblity: 
-						// If the first entity is the interactee instead of the interactor
-						// Swap the indices of the two
-						size_t tempIndex = interactorIndex;
-						interactorIndex = interacteeIndex;
-						interacteeIndex = tempIndex;
-					}
-				}
+			if (points.isColliding)
+			{
+				collisions.emplace_back(entities[i], entities[j], points);
 			}
 		}
-		// Interactions have been processed, finalize
-		for (Interaction* interaction : interactions)
+	}
+
+	for (const auto& [interactor, interactee, points] : collisions)
+	{
+		ProcessInteraction(deltaTime, interactor, interactee, points);
+		ProcessInteraction(deltaTime, interactee, interactor, points);
+	}
+}
+
+void InteractionWorld::ProcessInteraction(float deltaTime, const EntityInternal& interactor,
+	const EntityInternal& interactee, const CollisionPoints& points) const
+{
+	std::vector<BaseECSComponent*> interactorComponents;
+	std::vector<BaseECSComponent*> interacteeComponents;
+
+	// Iterate over all interactions where the interactor has all the required component types
+	for (const unsigned int interactorInteraction : interactor.interactors)
+	{
+		// Iterate over all interactions where the interactee has all the required component types
+		for (const unsigned int interacteeInteraction : interactee.interactees)
 		{
-			interaction->Finalize(deltaTime);
+			// If both indices match, an interaction where the interactor has all required component
+			// types and the interactee has all required component types has been found
+			if (interactorInteraction == interacteeInteraction)
+			{
+				// Get the interaction, which determines how the two entities should interact
+				Interaction* interaction = interactions[interactorInteraction];
+
+				// Resize the component vectors to fit the entities' components
+				interactorComponents.resize(std::max(interactorComponents.size(),
+					interaction->GetInteractorComponents().size()));
+				interacteeComponents.resize(std::max(interacteeComponents.size(),
+					interaction->GetInteracteeComponents().size()));
+
+				// Iterate over all required component types for the interactor
+				for (size_t i = 0; i < interaction->GetInteractorComponents().size(); i++)
+				{
+					// Get the component of the type from the interactor entity
+					// Add it to the interactor components list
+					interactorComponents[i] = ecs.GetComponentByType(interactor.handle,
+						interaction->GetInteractorComponents()[i]);
+				}
+
+				// Iterate over all required component types for the interactee
+				for (size_t i = 0; i < interaction->GetInteracteeComponents().size(); i++)
+				{
+					// Get the component of the type from the interactee entity
+					// Add it to the interactee components list
+					interacteeComponents[i] = ecs.GetComponentByType(interactee.handle,
+						interaction->GetInteracteeComponents()[i]);
+				}
+
+				// Pass in all relevant data to the interaction
+				interaction->Interact(deltaTime, interactor.handle, interactee.handle,
+					interactorComponents.data(), interacteeComponents.data(), points);
+			}
 		}
 	}
-
-	// Find and set max variance axis...
-	// TODO This lags behind by one frame
-
-	// Find the variance for each axis
-	centerSum /= (float)entities.size();
-	centerSquareSum /= (float)entities.size();
-	glm::vec3 variance = centerSquareSum - (centerSum * centerSum);
-
-	// From each of three axis, find the axis with the greatest variance
-	float maxVariance = variance[0];
-	unsigned int maxVarianceAxis = 0;
-	if (variance[1] > maxVariance)
-	{
-		maxVariance = variance[1];
-		maxVarianceAxis = 1;
-	}
-	if (variance[2] > maxVariance)
-	{
-		maxVariance = variance[2];
-		maxVarianceAxis = 2;
-	}
-
-	// Set the axis to the one with the greatest variance
-	compareAABB.axis = maxVarianceAxis;
 }
 
 void InteractionWorld::AddInteraction(Interaction* interaction)
@@ -331,8 +288,7 @@ void InteractionWorld::RemoveAndUpdateEntities()
 					ComputeInteractions(entities[i], k);
 				}
 
-				// Swap the entity being updated with the last element in the entitiesToUpdate
-				// list
+				// Swap the entity being updated with the last element in the entitiesToUpdate list
 				std::swap(entitiesToUpdate[j], entitiesToUpdate[entitiesToUpdate.size() - 1]);
 				// Remove the last element
 				entitiesToUpdate.pop_back();

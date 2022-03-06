@@ -6,6 +6,8 @@
 
 #include <vector>
 
+struct CollisionPoints;
+
 /**
  * @brief The Interaction class specifies how two entities should interact, in the event that an
  * interaction between the two is detected by the InteractionWorld.
@@ -15,6 +17,7 @@
 class Interaction
 {
 public:
+	virtual ~Interaction() = default;
 	/**
 	 * Called in the event that an interaction between the interactor and interactee is detected.
 	 * 
@@ -29,10 +32,8 @@ public:
 	 *			to the interactee entity.
 	 */
 	virtual void Interact(float deltaTime, EntityHandle interactor, EntityHandle interactee, 
-		BaseECSComponent** interactorComponents, BaseECSComponent** interacteeComponents) {}
-
-	/** @brief Called after all interactions have been processed. */
-	virtual void Finalize(float deltaTime) {}
+		BaseECSComponent** interactorComponents, BaseECSComponent** interacteeComponents,
+		const CollisionPoints& points) {}
 
 	/** @brief Gets the list of required component types for the interactor. */
 	const std::vector<unsigned int>& GetInteractorComponents() { return interactorComponentTypes; }
@@ -69,7 +70,7 @@ private:
 class InteractionWorld : public ECSListener
 {
 public:
-	InteractionWorld(ECS& ecs) : ECSListener(), ecs(ecs), compareAABB(ecs, 0)
+	InteractionWorld(ECS& ecs) : ECSListener(), ecs(ecs)
 	{
 		// Listen to all component operations
 		SetNotificationSettings(true, false);
@@ -118,39 +119,6 @@ private:
 		std::vector<unsigned int> interactees;
 	};
 
-	/**
-	 * @brief Functor which is used to determine, along the specified axis, if the min extents of 
-	 * one entity's AABB is smaller than the min extents of another entity's AABB.
-	 * 
-	 * This is useful for sorting the bounding boxes of entities along the max variance axis, which
-	 * allows for the implementation of the sort and sweep algorithm.
-	 */
-	struct InteractionWorldCompare
-	{
-		// If axis is set to 0, the X axis will be used
-		// If axis is set to 1, the Y axis will be used
-		// If axis is set to 2, the Z axis will be used
-		unsigned int axis = 0;
-		ECS& ecs;
-
-		/**
-		 * @param ecs Reference to the ECS, which is used to retrieve the components from entities.
-		 * @param axis The axis to perform comparisons on.
-		 */
-		InteractionWorldCompare(ECS& ecs, unsigned int axis) : ecs(ecs), axis(axis) {}
-
-		/** @brief Returns true if entity a's min extent is less than entity b's min extent. */
-		bool operator()(EntityInternal& a, EntityInternal& b)
-		{
-			float aMin = ecs.GetComponent<ColliderComponent>(
-				a.handle)->transformedAABB.GetMinExtents()[axis];
-			float bMin = ecs.GetComponent<ColliderComponent>(
-				b.handle)->transformedAABB.GetMinExtents()[axis];
-
-			return (aMin < bMin);
-		}
-	};
-
 	std::vector<EntityInternal> entities;
 
 	// List of entities to remove
@@ -166,7 +134,9 @@ private:
 	std::vector<Interaction*> interactions;
 
 	ECS& ecs;
-	InteractionWorldCompare compareAABB;
+
+	void ProcessInteraction(float deltaTime, const EntityInternal& interactor,
+		const EntityInternal& interactee, const CollisionPoints& points) const;
 
 	void RemoveAndUpdateEntities();
 

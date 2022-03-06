@@ -9,7 +9,7 @@
 struct MotionComponent : public ECSComponent<MotionComponent>
 {
 	glm::vec3 velocity = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 acceleration = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 force = glm::vec3(0.0f, 0.0f, 0.0f);
 };
 
 /**
@@ -33,7 +33,7 @@ public:
 		// Update position of the entity...
 		glm::vec3 newPosition = transform->transform.GetPosition();
 		MotionIntegrators::ModifiedEuler(newPosition, motion->velocity,
-			motion->acceleration, deltaTime);
+			motion->force, deltaTime);
 		transform->transform.SetPosition(newPosition);
 	}
 
