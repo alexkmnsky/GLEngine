@@ -2,9 +2,21 @@
 
 #include "RenderDevice.h"
 
+/**
+ * @brief Used to store uniform data for a shader program. A uniform buffer can be used to share
+ * uniforms between different programs, as well as quickly change between sets of uniforms for the
+ * same program object. 
+ */
 class UniformBuffer
 {
 public:
+	/**
+	 * @param device Render device to use.
+	 * @param dataSize The size in bytes of the buffer.
+	 * @param usage Hints for what the user will be doing with the buffer.
+	 * @param data A pointer to data that will be copied into the data store for initialization, or
+	 *		nullptr if no data is to be copied.
+	 */
 	UniformBuffer(RenderDevice& device, size_t dataSize, RenderDevice::BufferUsage usage,
 		const void* data = nullptr) : device(&device), size(dataSize)
 	{
@@ -16,14 +28,14 @@ public:
 		deviceID = device->ReleaseUniformBuffer(deviceID);
 	}
 
-	inline void Update(const void* data, size_t dataSize)
+	void Update(const void* data, size_t dataSize)
 	{
 		device->UpdateUniformBuffer(deviceID, data, dataSize);
 	}
 
-	inline void Update(const void* data) { Update(data, size); }
+	void Update(const void* data) { Update(data, size); }
 
-	inline unsigned int GetID() { return deviceID; }
+	unsigned int GetID() { return deviceID; }
 
 private:
 	// Disallow copy and assign
