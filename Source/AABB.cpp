@@ -1,6 +1,6 @@
 #include "AABB.h"
 
-AABB::AABB(std::vector<glm::vec3>& points)
+AABB::AABB(const std::vector<glm::vec3>& points)
 {
 	// No points are specified; no bounding box can be formed
 	if (points.size() == 0)
@@ -15,7 +15,7 @@ AABB::AABB(std::vector<glm::vec3>& points)
 	extents[1] = points[0];
 
 	// Loop over all specified points and find the min and max extents
-	for (glm::vec3& point : points)
+	for (const glm::vec3& point : points)
 	{
 		extents[0].x = std::min(extents[0].x, point.x);
 		extents[0].y = std::min(extents[0].y, point.y);
@@ -27,7 +27,7 @@ AABB::AABB(std::vector<glm::vec3>& points)
 	}
 }
 
-bool AABB::Intersects(const AABB& other)
+bool AABB::Intersects(const AABB& other) const
 {
 	return !(
 		(

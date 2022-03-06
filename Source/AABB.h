@@ -9,7 +9,7 @@ class AABB
 {
 public:
 	/** @brief Default AABB constructor. */
-	inline AABB()
+	AABB()
 	{
 		extents[0] = glm::vec3(0.0f);
 		extents[1] = glm::vec3(0.0f);
@@ -22,7 +22,7 @@ public:
 	 * @param minExtents
 	 * @param maxExtents
 	 */
-	inline AABB(const glm::vec3& minExtents, const glm::vec3& maxExtents)
+	AABB(const glm::vec3& minExtents, const glm::vec3& maxExtents)
 	{
 		extents[0] = minExtents;
 		extents[1] = maxExtents;
@@ -35,7 +35,7 @@ public:
 	 * 
 	 * @param points The points to loop over.
 	 */
-	AABB(std::vector<glm::vec3>& points);
+	AABB(const std::vector<glm::vec3>& points);
 
 	/**
 	 * Determines if the AABB is intersecting another AABB.
@@ -43,7 +43,7 @@ public:
 	 * @param other The other AABB to compare against.
 	 * @return Whether or not the two AABBs are intersecting.
 	 */
-	bool Intersects(const AABB& other);
+	bool Intersects(const AABB& other) const;
 
 	/**
 	 * Translates a copy of the AABB. No rotation or scaling is applied.
@@ -51,12 +51,12 @@ public:
 	 * @param translation The translation to apply.
 	 * @return The translated copy of the AABB.
 	 */
-	AABB Translate(const glm::vec3& translation) const;
+	[[nodiscard]] AABB Translate(const glm::vec3& translation) const;
 
 	// Getter methods...
-	inline glm::vec3 GetCenter() { return (extents[0] + extents[1]) * 0.5f; }
-	inline glm::vec3 GetMinExtents() { return extents[0]; }
-	inline glm::vec3 GetMaxExtents() { return extents[1]; }
+	[[nodiscard]] glm::vec3 GetCenter() const { return (extents[0] + extents[1]) * 0.5f; }
+	[[nodiscard]] glm::vec3 GetMinExtents() const { return extents[0]; }
+	[[nodiscard]] glm::vec3 GetMaxExtents() const { return extents[1]; }
 
 private:
 	glm::vec3 extents[2];
