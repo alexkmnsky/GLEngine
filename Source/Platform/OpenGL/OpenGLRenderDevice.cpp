@@ -6,16 +6,46 @@
 #include <unordered_map>
 #include <iostream>
 
+/**
+ * @brief Compiles and adds an OpenGL shader to an OpenGL shader program.
+ * @param shaderProgram Target shader program ID.
+ * @param text Shader text to compile. This is typically the 'source code' of a shader file.
+ * @param type Shader type (for example, vertex shader, fragment shader, etc.).
+ * @param shaders Vector to add the newly created shader ID to.
+ * @return true if the shader was compiled and added successfully.
+ */
 static bool AddShader(GLuint shaderProgram, const std::string& text, GLenum type, 
 	std::vector<GLuint>* shaders);
 
-static void AddAllAttributes(GLuint program, const std::string& vertexShaderText,
-	unsigned int version);
+/**
+ * @brief Adds and binds all attributes in a shader program. Note: this assumes attributes are
+ *		listed in order, which isn't true for all compilers.
+ * @param program Target shader program ID.
+ * @param version Current OpenGL version. If the OpenGL version is above 320 (3.2), layout is used
+ *		in favor of attributes.
+ */
+static void AddAllAttributes(GLuint program, unsigned int version);
 
+/**
+ * @brief Polls OpenGL for shader errors.
+ * @param shader ID of the shader to check errors for.
+ * @param flag Specifies which parameter to check for errors. For more details see documentation for
+ *		glGetProgramiv and glGetShaderiv.
+ * @param isProgram Whether shader is a program object or a shader object.
+ * @param errorMessage Error message prefixed to the OpenGL error message.
+ * @return true if there was an error.
+ */
 static bool CheckShaderError(GLuint shader, int flag, bool isProgram, 
 	const std::string& errorMessage);
 
-static void AddShaderUniforms(GLuint shaderProgram, const std::string& shaderText,
+/**
+ * @brief Fetches all uniform blocks and uniform variables from an OpenGL shader.
+ * @note Non-sampler2D uniforms are currently unsupported.
+ * @param shaderProgram Target shader program ID.
+ * @param uniformMap Map to push uniform block names and locations to, for future lookup.
+ * @param samplerMap Map to push sampler2D uniform names and locations to, for future lookup.
+ */
+static void AddShaderUniforms(GLuint shaderProgram, 
 	std::unordered_map<std::string, GLint>& uniformMap,
 	std::unordered_map<std::string, GLint>& samplerMap);
 
@@ -27,8 +57,8 @@ bool OpenGLRenderDevice::GlobalInit()
 	if (isInitialized) return true;
 
 	// OpenGL Version 3.3
-	int major = 3;
-	int minor = 3;
+	constexpr int major = 3;
+	constexpr int minor = 3;
 
 	isInitialized = true;
 	// Attempt to set core profile
@@ -84,7 +114,7 @@ OpenGLRenderDevice::OpenGLRenderDevice(Window& window) :
 	context = SDL_GL_CreateContext(window.GetWindowHandle());
 	
 	// Initialize GLEW, check if failed
-	GLenum result = glewInit();
+	const GLenum result = glewInit();
 	if (result != GLEW_OK)
 	{
 		std::cerr << "Error: " << glewGetErrorString(result) << std::endl;
@@ -97,7 +127,7 @@ OpenGLRenderDevice::OpenGLRenderDevice(Window& window) :
 	fboWindowData.height = window.GetHeight();
 	fboMap[0] = fboWindowData;
 
-	glEnable(GL_DEPTH_TEST); // Ensures we have a depth buffer (for more info look up Z-buffering)
+	glEnable(GL_DEPTH_TEST); // Ensures we have a depth buffer (for details look up Z-buffering)
 	glDepthFunc(DRAW_FUNC_ALWAYS); // Default the depth buffer to always pass; we will set later
 	glDepthMask(GL_FALSE); // Default to disabling depth buffer write; this can change later
 	glFrontFace(GL_CCW); // Specifies which side front-facing based on vertex winding order
@@ -118,7 +148,7 @@ unsigned int OpenGLRenderDevice::CreateRenderTarget(unsigned int texture, unsign
 	glGenBuffers(1, &fbo);
 	SetFBO(fbo);
 
-	GLenum attachmentTypeGL = attachment + attachmentNumber;
+	const GLenum attachmentTypeGL = attachment + attachmentNumber;
 	glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentTypeGL, GL_TEXTURE_2D, texture, mipLevel);
 
 	// Save framebuffer width and height
@@ -144,7 +174,7 @@ unsigned int OpenGLRenderDevice::ReleaseRenderTarget(unsigned int fbo)
 	if (fbo == 0) return 0;
 
 	// Check if the framebuffer exists...
-	std::unordered_map<unsigned int, FBOData>::iterator it = fboMap.find(fbo);
+	const std::unordered_map<unsigned int, FBOData>::iterator it = fboMap.find(fbo);
 
 	// Framebuffer could not be found; it was never created or was already deleted.
 	if (it == fboMap.end())
@@ -164,7 +194,7 @@ unsigned int OpenGLRenderDevice::CreateVertexArray(const float** vertexData,
 	unsigned int numIndices, BufferUsage usage)
 {
 	// Vertex Components + Instance Components + Indices
-	unsigned int numBuffers = numVertexComponents + numInstanceComponents + 1;
+	const unsigned int numBuffers = numVertexComponents + numInstanceComponents + 1;
 
 	GLuint vao; // Vertex Array Object (VAO)
 	GLuint* buffers = new GLuint[numBuffers];
@@ -187,11 +217,11 @@ unsigned int OpenGLRenderDevice::CreateVertexArray(const float** vertexData,
 			inInstancedMode = true;
 		}
 
-		unsigned int elementSize = vertexElementSizes[i];
+		const unsigned int elementSize = vertexElementSizes[i];
 		// If this is an instance component, there is no data to bind as it will be updated each
 		// frame. If no vertex data was supplied, leave it empty.
 		const void* bufferData = (inInstancedMode || vertexData == nullptr) ? nullptr : vertexData[i];
-		size_t dataSize = inInstancedMode 
+		const size_t dataSize = inInstancedMode 
 			? elementSize * sizeof(float) 
 			: elementSize * sizeof(float) * numVertices;
 
@@ -201,8 +231,8 @@ unsigned int OpenGLRenderDevice::CreateVertexArray(const float** vertexData,
 
 		// Because OpenGL doesn't support attributes with more than 4 elements, each set of 4 
 		// elements gets its own attribute.
-		unsigned int elementSizeDiv = elementSize / 4;
-		unsigned int elementSizeRem = elementSize % 4;
+		const unsigned int elementSizeDiv = elementSize / 4;
+		const unsigned int elementSizeRem = elementSize % 4;
 		for (unsigned int j = 0; j < elementSizeDiv; j++)
 		{
 			glEnableVertexAttribArray(attribute);
@@ -245,7 +275,7 @@ unsigned int OpenGLRenderDevice::CreateVertexArray(const float** vertexData,
 	}
 
 	// Bind vertex array indices...
-	size_t indicesSize = numIndices * sizeof(unsigned int);
+	const size_t indicesSize = numIndices * sizeof(unsigned int);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[numBuffers - 1]);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, indices, usage);
 
@@ -273,7 +303,7 @@ void OpenGLRenderDevice::UpdateVertexArrayBuffer(unsigned int vao, unsigned int 
 	}
 
 	// Check if the VAO exists...
-	std::unordered_map<unsigned int, VertexArray>::iterator it = vaoMap.find(vao);
+	const std::unordered_map<unsigned int, VertexArray>::iterator it = vaoMap.find(vao);
 
 	// VAO could not be found; it was never created or was deleted.
 	if (it == vaoMap.end())
@@ -315,7 +345,7 @@ unsigned int OpenGLRenderDevice::ReleaseVertexArray(unsigned int vao)
 	}
 	
 	// Check if the VAO exists...
-	std::unordered_map<unsigned int, VertexArray>::iterator it = vaoMap.find(vao);
+	const std::unordered_map<unsigned int, VertexArray>::iterator it = vaoMap.find(vao);
 
 	// VAO could not be found; it was never created or was already deleted.
 	if (it == vaoMap.end())
@@ -362,7 +392,7 @@ unsigned int OpenGLRenderDevice::ReleaseSampler(unsigned int sampler)
 	return 0;
 }
 
-static GLint GetOpenGLFormat(enum OpenGLRenderDevice::PixelFormat format)
+static GLint GetOpenGLFormat(OpenGLRenderDevice::PixelFormat format)
 {
 	switch (format)
 	{
@@ -375,10 +405,10 @@ static GLint GetOpenGLFormat(enum OpenGLRenderDevice::PixelFormat format)
 	default:
 		std::cerr << "Error: PixelFormat " << format << " is not a valid PixelFormat." << std::endl;
 		return 0;
-	};
+	}
 }
 
-static GLint GetOpenGLInternalFormat(enum OpenGLRenderDevice::PixelFormat format, bool compress)
+static GLint GetOpenGLInternalFormat(OpenGLRenderDevice::PixelFormat format, bool compress)
 {
 	switch (format)
 	{
@@ -389,34 +419,28 @@ static GLint GetOpenGLInternalFormat(enum OpenGLRenderDevice::PixelFormat format
 		{
 			return GL_COMPRESSED_SRGB_S3TC_DXT1_EXT;
 		}
-		else
-		{
-			return GL_RGB;
-		}
+		return GL_RGB;
 	case OpenGLRenderDevice::FORMAT_RGBA:
 		if (compress)
 		{
 			return GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT;
 		}
-		else
-		{
-			return GL_RGBA;
-		}
+		return GL_RGBA;
 	case OpenGLRenderDevice::FORMAT_DEPTH: return GL_DEPTH_COMPONENT;
 	case OpenGLRenderDevice::FORMAT_DEPTH_AND_STENCIL: return GL_DEPTH_STENCIL;
 	default:
 		std::cerr << "Error: PixelFormat " << format << " is not a valid PixelFormat." << std::endl;
 		return 0;
-	};
+	}
 }
 
 unsigned int OpenGLRenderDevice::CreateTexture2D(int width, int height, const void* data, 
 	PixelFormat dataFormat, PixelFormat internalFormat, bool generateMipmaps, bool compress,
-	unsigned int packAlignment, unsigned int unpackAlignment)
+	int packAlignment, int unpackAlignment)
 {
-	GLint format = GetOpenGLFormat(dataFormat);
-	GLint glInternalFormat = GetOpenGLInternalFormat(internalFormat, compress);
-	GLenum textureTarget = GL_TEXTURE_2D;
+	const GLint format = GetOpenGLFormat(dataFormat);
+	const GLint glInternalFormat = GetOpenGLInternalFormat(internalFormat, compress);
+	const GLenum textureTarget = GL_TEXTURE_2D;
 	GLuint textureHandle;
 
 	if (packAlignment != currentPackAlignment)
@@ -499,7 +523,7 @@ unsigned int OpenGLRenderDevice::ReleaseUniformBuffer(unsigned int buffer)
 
 unsigned int OpenGLRenderDevice::CreateShaderProgram(const std::string& shaderText)
 {
-	GLuint shaderProgram = glCreateProgram();
+	const GLuint shaderProgram = glCreateProgram();
 
 	// Should never be 0 as shader 0 is null. Something went wrong...
 	if (shaderProgram == 0)
@@ -548,8 +572,8 @@ unsigned int OpenGLRenderDevice::CreateShaderProgram(const std::string& shaderTe
 		return (unsigned int)-1;
 	}
 
-	AddAllAttributes(shaderProgram, vertexShaderText, GetVersion());
-	AddShaderUniforms(shaderProgram, shaderText, programData.uniformMap, programData.samplerMap);
+	AddAllAttributes(shaderProgram, GetVersion());
+	AddShaderUniforms(shaderProgram, programData.uniformMap, programData.samplerMap);
 
 	shaderProgramMap[shaderProgram] = programData;
 	return shaderProgram;
@@ -579,7 +603,7 @@ unsigned int OpenGLRenderDevice::ReleaseShaderProgram(unsigned int shader)
 	if (shader == 0) return 0;
 
 	// Check if the shader exists...
-	auto programIt = shaderProgramMap.find(shader);
+	const auto programIt = shaderProgramMap.find(shader);
 	if (programIt == shaderProgramMap.end())
 	{
 		// Shader could not be found, it was never created or was already deleted.
@@ -603,7 +627,7 @@ unsigned int OpenGLRenderDevice::ReleaseShaderProgram(unsigned int shader)
 void OpenGLRenderDevice::SetShaderInt(unsigned int shader, const std::string& name, int value)
 {
 	SetShader(shader);
-	GLint location = glGetUniformLocation(shader, name.c_str());
+	const GLint location = glGetUniformLocation(shader, name.c_str());
 	glUniform1i(location, value);
 }
 
@@ -611,14 +635,14 @@ void OpenGLRenderDevice::SetShaderIntArray(unsigned int shader, const std::strin
 	int* values, uint32_t count)
 {
 	SetShader(shader);
-	GLint location = glGetUniformLocation(shader, name.c_str());
+	const GLint location = glGetUniformLocation(shader, name.c_str());
 	glUniform1iv(location, count, values);
 }
 
 void OpenGLRenderDevice::SetShaderFloat(unsigned int shader, const std::string& name, float value)
 {
 	SetShader(shader);
-	GLint location = glGetUniformLocation(shader, name.c_str());
+	const GLint location = glGetUniformLocation(shader, name.c_str());
 	glUniform1f(location, value);
 }
 
@@ -626,7 +650,7 @@ void OpenGLRenderDevice::SetShaderFloat2(unsigned int shader, const std::string&
 	const float* values)
 {
 	SetShader(shader);
-	GLint location = glGetUniformLocation(shader, name.c_str());
+	const GLint location = glGetUniformLocation(shader, name.c_str());
 	glUniform2f(location, values[0], values[1]);
 }
 
@@ -634,7 +658,7 @@ void OpenGLRenderDevice::SetShaderFloat3(unsigned int shader, const std::string&
 	const float* values)
 {
 	SetShader(shader);
-	GLint location = glGetUniformLocation(shader, name.c_str());
+	const GLint location = glGetUniformLocation(shader, name.c_str());
 	glUniform3f(location, values[0], values[1], values[2]);
 }
 
@@ -642,7 +666,7 @@ void OpenGLRenderDevice::SetShaderFloat4(unsigned int shader, const std::string&
 	const float* values)
 {
 	SetShader(shader);
-	GLint location = glGetUniformLocation(shader, name.c_str());
+	const GLint location = glGetUniformLocation(shader, name.c_str());
 	glUniform4f(location, values[0], values[1], values[2], values[3]);
 }
 
@@ -650,7 +674,7 @@ void OpenGLRenderDevice::SetShaderMat3(unsigned int shader, const std::string& n
 	const float* values)
 {
 	SetShader(shader);
-	GLint location = glGetUniformLocation(shader, name.c_str());
+	const GLint location = glGetUniformLocation(shader, name.c_str());
 	glUniformMatrix3fv(location, 1, GL_FALSE, values);
 }
 
@@ -658,7 +682,7 @@ void OpenGLRenderDevice::SetShaderMat4(unsigned int shader, const std::string& n
 	const float* values)
 {
 	SetShader(shader);
-	GLint location = glGetUniformLocation(shader, name.c_str());
+	const GLint location = glGetUniformLocation(shader, name.c_str());
 	glUniformMatrix4fv(location, 1, GL_FALSE, values);
 }
 
@@ -973,7 +997,7 @@ std::string OpenGLRenderDevice::GetShaderVersion()
 		return shaderVersion;
 	}
 
-	unsigned int version = GetVersion();
+	const unsigned int version = GetVersion();
 
 	if (version >= 330)
 	{
@@ -1001,8 +1025,8 @@ std::string OpenGLRenderDevice::GetShaderVersion()
 	}
 	else
 	{
-		int majorVersion = version / 100;
-		int minorVersion = (version / 10) % 10;
+		const int majorVersion = version / 100;
+		const int minorVersion = (version / 10) % 10;
 		std::cerr << "Error: OpenGL Version " << majorVersion << "." << minorVersion <<
 			"does not support shaders." << std::endl;
 		return "";
@@ -1014,7 +1038,7 @@ std::string OpenGLRenderDevice::GetShaderVersion()
 bool AddShader(GLuint shaderProgram, const std::string& text, GLenum type, 
 	std::vector<GLuint>* shaders)
 {
-	GLuint shader = glCreateShader(type);
+	const GLuint shader = glCreateShader(type);
 
 	// Should never be 0 as shader 0 is null. Something went wrong...
 	if (shader == 0)
@@ -1051,7 +1075,7 @@ bool AddShader(GLuint shaderProgram, const std::string& text, GLenum type,
 	return true;
 }
 
-void AddAllAttributes(GLuint program, const std::string& vertexShaderText, unsigned int version)
+void AddAllAttributes(GLuint program, unsigned int version)
 {
 	if (version >= 320)
 	{
@@ -1112,8 +1136,7 @@ bool CheckShaderError(GLuint shader, int flag, bool isProgram, const std::string
 	return false;
 }
 
-void AddShaderUniforms(GLuint shaderProgram, const std::string& shaderText, 
-	std::unordered_map<std::string, GLint>& uniformMap, 
+void AddShaderUniforms(GLuint shaderProgram, std::unordered_map<std::string, GLint>& uniformMap, 
 	std::unordered_map<std::string, GLint>& samplerMap)
 {
 	// Get the number of active uniform blocks for the program 
@@ -1132,7 +1155,7 @@ void AddShaderUniforms(GLuint shaderProgram, const std::string& shaderText,
 	}
 
 	// Get the number of active uniform variables for the program 
-	GLint numUniforms = 0;
+	const GLint numUniforms = 0;
 	glGetProgramiv(shaderProgram, GL_ACTIVE_UNIFORMS, &numBlocks);
 
 	// Would get GL_ACTIVE_UNIFORM_MAX_LENGTH, but buggy on some drivers.

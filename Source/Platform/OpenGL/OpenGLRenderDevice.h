@@ -11,9 +11,27 @@
 
 typedef SDL_GLContext DeviceContext;
 
+/**
+ * @brief Rendering interface/wrapper for OpenGL version 3.3 core. For details on OpenGL functions
+ * (prefixed with gl), refer to the documentation which can be found here:
+ *		- https://www.khronos.org/opengl/
+ *		- https://docs.gl/
+ */
 class OpenGLRenderDevice
 {
 public:
+	/**
+	 * @brief Hints for what the user will be doing with the buffer and how frequently the user will
+	 * be changing the buffer's data
+	 *
+	 * DRAW: The user will be writing data to the buffer, but the user will not read it.
+	 * READ: The user will not be writing data, but the user will be reading it back.
+	 * COPY: The user will be neither writing nor reading the data.
+	 *
+	 * STATIC: The user will set the data once.
+	 * DYNAMIC: The user will set the data occasionally.
+	 * STREAM: The user will be changing the data after every use, or almost every use.
+	 */
 	enum BufferUsage
 	{
 		USAGE_STATIC_DRAW = GL_STATIC_DRAW,
@@ -68,7 +86,7 @@ public:
 		PRIMITIVE_LINES_ADJACENCY = GL_LINES_ADJACENCY,
 		PRIMITIVE_TRIANGLE_STRIP = GL_TRIANGLE_STRIP,
 		PRIMITIVE_TRIANGLE_FAN = GL_TRIANGLE_FAN,
-		PRIMITIVE_TRAINGLE_STRIP_ADJACENCY = GL_TRIANGLE_STRIP_ADJACENCY,
+		PRIMITIVE_TRIANGLE_STRIP_ADJACENCY = GL_TRIANGLE_STRIP_ADJACENCY,
 		PRIMITIVE_TRIANGLES_ADJACENCY = GL_TRIANGLES_ADJACENCY,
 		PRIMITIVE_PATCHES = GL_PATCHES,
 	};
@@ -115,7 +133,7 @@ public:
 		STENCIL_KEEP = GL_KEEP,
 		STENCIL_ZERO = GL_ZERO,
 		STENCIL_REPLACE = GL_REPLACE,
-		STENICL_INCR = GL_INCR,
+		STENCIL_INCR = GL_INCR,
 		STENCIL_INCR_WRAP = GL_INCR_WRAP,
 		STENCIL_DECR_WRAP = GL_DECR_WRAP,
 		STENCIL_DECR = GL_DECR,
@@ -146,40 +164,156 @@ public:
 	};
 
 	/**
-	 * Sets OpenGL attributes/version if not already initialized.
-	 * 
+	 * @brief Sets OpenGL attributes/version if not already initialized.
 	 * @return true if OpenGL is (or already was) successfully initialized.
 	 */
 	static bool GlobalInit();
 
+	/**
+	 * @param window Window to create the OpenGL context in.
+	 * @todo Remove SDL2 dependency.
+	 */
 	OpenGLRenderDevice(Window& window);
 	virtual ~OpenGLRenderDevice();
 
+	/** 
+	 * @brief Creates a framebuffer object (FBO) and attaches a texture image to the FBO.
+	 * @param texture The ID of the texture object whose image is to be attached.
+	 * @param width Framebuffer width.
+	 * @param height Framebuffer height.
+	 * @param attachment The logical attachment of the framebuffer (see OpenGL documentation for
+	 *		glFramebufferTexture).
+	 * @param attachmentNumber If using ATTACHMENT_COLOR, this is the color attachment number,
+	 *		as there can be multiple color attachments.
+	 * @param mipLevel The mipmap level of the texture image to be attached, which must be 0.
+	 * @return ID of the created FBO.
+	 */
 	unsigned int CreateRenderTarget(unsigned int texture, unsigned int width, unsigned int height,
 		FramebufferAttachment attachment, unsigned int attachmentNumber, unsigned int mipLevel);
+
+	/**
+	 * @brief Updates framebuffer size.
+	 * @param fbo Target framebuffer object ID.
+	 * @param width New width.
+	 * @param height New height.
+	 */
 	void UpdateRenderTarget(unsigned int fbo, unsigned int width, unsigned int height);
+
+	/**
+	 * @brief Releases a framebuffer object (FBO).
+	 * @param fbo ID of the FBO to release.
+	 * @return FBO ID, 0, which is null.
+	 */
 	unsigned int ReleaseRenderTarget(unsigned int fbo);
 
+	/**
+	 * @brief Creates a vertex array object (VAO) which contains one vertex buffer object (VBO).
+	 *		VBO data can be updated via UpdateVertexArrayBuffer.
+	 * @param vertexData Two dimensional array of vertex data, where each inner array represents
+	 *		per-vertex attribute data. If set to nullptr, no initial vertex data will be set.
+	 * @param vertexElementSizes The size of each vertex element (each attribute size).
+	 * @param numVertexComponents Number of per-vertex components/attributes.
+	 * @param numInstanceComponents Number of per-instance components/attributes.
+	 * @param numVertices Number of model vertices.
+	 * @param indices Vertex indices, used to construct the primitive type.
+	 * @param numIndices Number of vertex indices.
+	 * @param usage Hint for how the vertex array buffer will be used.
+	 * @return ID of the created VAO.
+	 */
 	unsigned int CreateVertexArray(const float** vertexData, const unsigned int* vertexElementSizes,
 		unsigned int numVertexComponents, unsigned int numInstanceComponents,
 		unsigned int numVertices, const unsigned int* indices, unsigned int numIndices, 
 		BufferUsage usage);
+
+	/**
+	 * @brief 
+	 * @param vao 
+	 * @param bufferIndex 
+	 * @param data 
+	 * @param dataSize 
+	 */
 	void UpdateVertexArrayBuffer(unsigned int vao, unsigned int bufferIndex, const void* data,
 		size_t dataSize);
+
+	/**
+	 * @brief Releases a vertex array object (VAO) and any associated vertex buffer objects (VBOs).
+	 * @param vao ID of the VAO to release.
+	 * @return VAO ID, 0, which is null.
+	 */
 	unsigned int ReleaseVertexArray(unsigned int vao);
 
+	/**
+	 * @brief Creates a sampler object.
+	 * @param minFilter Minification filter. Determines how a texture is shrunk when sampled.
+	 * @param magFilter Magnification filter. Determines how a texture is enlarged when sampled.
+	 * @param wrapU Behavior when U texture coordinate is out of bounds.
+	 * @param wrapV Behavior when V texture coordinate is out of bounds.
+	 * @param anisotropy Maximum number of samples for anisotropic filtering.
+	 * @return ID of the created sampler.
+	 */
 	unsigned int CreateSampler(SamplerFilter minFilter, SamplerFilter magFilter,
 		SamplerWrapMode wrapU, SamplerWrapMode wrapV, float anisotropy);
+
+	/**
+	 * @brief Releases a sampler object.
+	 * @param sampler ID of the sampler to release.
+	 * @return Sampler ID, 0, which is null.
+	 */
 	unsigned int ReleaseSampler(unsigned int sampler);
 
+	/**
+	 * @brief Creates a 2D texture object.
+	 * @param width Pixel width of the texture.
+	 * @param height Pixel height of the texture.
+	 * @param data Pointer to texture data.
+	 * @param dataFormat Specifies the format of the pixel data.
+	 * @param internalFormat Specifies the number of color components in the texture.
+	 * @param generateMipmaps Whether mipmaps should be generated. This can help remove artifacts
+	 *		when the image is scaled down (typically when viewed from far away in perspective).
+	 * @param compress Whether OpenGL should attempt to compress the texture before storage.
+	 * @param packAlignment Valid values are 1, 2, 4, or 8. Sets the alignment requirements for the
+	 *		start of each pixel row in memory. Affects how pixel data is returned to client memory.
+	 * @param unpackAlignment Valid values are 1, 2, 4, or 8. Sets the alignment requirements for
+	 *		the start of each pixel row in memory. Affects how pixel data is read from client
+	 *		memory.
+	 * @return ID of the created 2D texture.
+	 */
 	unsigned int CreateTexture2D(int width, int height, const void* data, PixelFormat dataFormat, 
-		PixelFormat internalFormat,	bool generateMipmaps, bool compress,
-		unsigned int packAlignment, unsigned int unpackAlignment);
+		PixelFormat internalFormat,	bool generateMipmaps, bool compress, int packAlignment, 
+		int unpackAlignment);
+
+	/**
+	 * @brief Releases a 2D texture object.
+	 * @param texture2D ID of the texture to release.
+	 * @return Texture ID, 0, which is null.
+	 */
 	unsigned int ReleaseTexture2D(unsigned int texture2D);
 
+	/**
+	 * @brief Creates a uniform buffer object (UBO).
+	 * @param data A pointer to data that will be copied into the data store for initialization, or
+	 *		nullptr if no data is to be copied.
+	 * @param dataSize The size in bytes of the buffer.
+	 * @param usage Hint for how the uniform buffer will be used.
+	 * @return ID of the created UBO.
+	 */
 	unsigned int CreateUniformBuffer(const void* data, size_t dataSize, BufferUsage usage);
+
+	/**
+	 * @brief Updates a uniform buffer's contents/data.
+	 * @param buffer ID of the target UBO.
+	 * @param data A pointer to data that will be copied into the data store.
+	 * @param dataSize The size in bytes of the buffer.
+	 */
 	void UpdateUniformBuffer(unsigned int buffer, const void* data, size_t dataSize);
+
+	/**
+	 * @brief Releases a uniform buffer object (UBO).
+	 * @param buffer ID of the UBO to release.
+	 * @return UBO ID, 0, which is null.
+	 */
 	unsigned int ReleaseUniformBuffer(unsigned int buffer);
+
 
 	unsigned int CreateShaderProgram(const std::string& shaderText);
 	void SetShaderUniformBuffer(unsigned int shader, const std::string& uniformBufferName,
@@ -188,23 +322,108 @@ public:
 		unsigned int sampler, unsigned int unit);
 	unsigned int ReleaseShaderProgram(unsigned int shader);
 
+	/**
+	 * @brief Sets an integer uniform for a shader.
+	 * @param shader Shader ID.
+	 * @param name Uniform variable name.
+	 * @param value	Value to set the uniform to.
+	 */
 	void SetShaderInt(unsigned int shader, const std::string& name, int value);
-	void SetShaderIntArray(unsigned int shader, const std::string& name, int* values, uint32_t count);
+
+	/**
+	 * @brief Sets an integer array uniform for a shader.
+	 * @param shader Shader ID.
+	 * @param name Uniform variable name.
+	 * @param values Array values to set the uniform to.
+	 * @param count Number of values in the array.
+	 */
+	void SetShaderIntArray(unsigned int shader, const std::string& name, int* values, 
+		uint32_t count);
+
+	/**
+	 * @brief Sets a float uniform for a shader.
+	 * @param shader Shader ID.
+	 * @param name Uniform variable name.
+	 * @param value Value to set the uniform to.
+	 */
 	void SetShaderFloat(unsigned int shader, const std::string& name, float value);
+
+	/**
+	 * @brief Sets a float2 (a.k.a. vec2) uniform for a shader.
+	 * @param shader Shader ID.
+	 * @param name Uniform variable name.
+	 * @param values Pointer to the first element in a two-element array.
+	 */
 	void SetShaderFloat2(unsigned int shader, const std::string& name, const float* values);
+
+	/**
+	 * @brief Sets a float3 (a.k.a. vec3) uniform for a shader.
+	 * @param shader Shader ID.
+	 * @param name Uniform variable name.
+	 * @param values Pointer to the first element in a three-element array.
+	 */
 	void SetShaderFloat3(unsigned int shader, const std::string& name, const float* values);
+
+	/**
+	 * @brief Sets a float4 (a.k.a. vec4) uniform for a shader.
+	 * @param shader Shader ID.
+	 * @param name Uniform variable name.
+	 * @param values Pointer to the first element in a four-element array.
+	 */
 	void SetShaderFloat4(unsigned int shader, const std::string& name, const float* values);
+
+	/**
+	 * @brief Sets a mat3 uniform for a shader.
+	 * @param shader Shader ID.
+	 * @param name Uniform variable name.
+	 * @param values Pointer to the first element in a nine-element (3x3) array.
+	 */
 	void SetShaderMat3(unsigned int shader, const std::string& name, const float* values);
+
+	/**
+	 * @brief Sets a mat4 uniform for a shader.
+	 * @param shader Shader ID.
+	 * @param name Uniform variable name.
+	 * @param values Pointer to the first element in a sixteen-element (4x4) array.
+	 */
 	void SetShaderMat4(unsigned int shader, const std::string& name, const float* values);
 
-	void Clear(unsigned int fbo, bool shouldClearColor, bool shouldClearDepth, 
-		bool shouldClearStencil, const float r, const float g, const float b, const float a,
-		unsigned int stencil);
+	// TODO there are many types of shader uniforms which do not have setters yet
 
+	/**
+	 * @brief Clears a framebuffer.
+	 * @param fbo The target framebuffer object for clearing.
+	 * @param shouldClearColor Whether or not the FBO's color buffer should be cleared.
+	 * @param shouldClearDepth Whether or not the FBO's depth buffer should be cleared.
+	 * @param shouldClearStencil Whether or not the FBO's stencil buffer should be cleared.
+	 * @param r Red value of the color to fill the color buffer with (if it is cleared).
+	 * @param g Green value of the color to fill the color buffer with (if it is cleared).
+	 * @param b Blue value of the color to fill the color buffer with (if it is cleared).
+	 * @param a Alpha value of the color to fill the color buffer with (if it is cleared).
+	 * @param stencil Stencil mask ID. See glStencilMask for more details.
+	 */
+	void Clear(unsigned int fbo, bool shouldClearColor, bool shouldClearDepth, 
+		bool shouldClearStencil, float r, float g, float b, float a, unsigned int stencil);
+
+	/**
+	 * @brief Draws to a framebuffer.
+	 * @param fbo The target framebuffer object for drawing.
+	 * @param shader ID of the shader to use.
+	 * @param vao ID of the vertex array object to use.
+	 * @param drawParameters See DrawParameters for all options.
+	 * @param numInstances Number of times the model will be drawn, the "number of instances".
+	 * @param numElements Number of vertices being drawn. Not to be confused with the number of
+	 *		vertices in a model/vertex array; this count includes duplicate vertices which are
+	 *		represented with the vertex array's indices.
+	 */
 	void Draw(unsigned int fbo, unsigned int shader, unsigned int vao, 
 		const DrawParameters& drawParameters, unsigned int numInstances, unsigned int numElements);
 
-	void SetDrawParameters(const OpenGLRenderDevice::DrawParameters& drawParameters);
+	/** 
+	 * @brief Setter for draw parameters.
+	 * @see DrawParameters
+	 */
+	void SetDrawParameters(const DrawParameters& drawParameters);
 
 private:
 	// Disallow copy and assign
@@ -230,8 +449,8 @@ private:
 
 	struct FBOData
 	{
-		int width;
-		int height;
+		unsigned int width;
+		unsigned int height;
 	};
 
 	void SetFBO(unsigned int fbo);
@@ -280,6 +499,6 @@ private:
 	bool shouldWriteDepth;
 	bool stencilTestEnabled;
 	bool scissorTestEnabled;
-	unsigned int currentPackAlignment;
-	unsigned int currentUnpackAlignment;
+	int currentPackAlignment;
+	int currentUnpackAlignment;
 };
