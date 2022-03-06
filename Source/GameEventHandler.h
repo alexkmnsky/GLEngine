@@ -5,7 +5,6 @@
 #include "Events/AxisControl.h"
 #include "Events/BinaryControl.h"
 #include "Events/MotionControl.h"
-#include "Events/MotionControl.h"
 
 #include <unordered_map>
 #include <set>
@@ -27,16 +26,14 @@ public:
 	void OnMouseUp(unsigned int mouseButton, unsigned char numberOfClicks) override;
 	void OnMouseMove(unsigned int mousePositionX, unsigned int mousePositionY, int deltaX, 
 		int deltaY) override;
-	void OnWindowResized(unsigned int windowWidth, unsigned int windowHeight) override;
+	void OnWindowResize(unsigned int windowWidth, unsigned int windowHeight) override;
 
 	void AddKeyAxisControl(unsigned int keyCode, AxisControl& control, float weight = 1.0f);
 	void AddKeyActionControl(unsigned int keyCode, ActionControl& control);
 	void AddKeyBinaryControl(unsigned int keyCode, BinaryControl& control);
-
 	void AddButtonAxisControl(unsigned int mouseButton, AxisControl& control, float weight = 1.0f);
 	void AddButtonActionControl(unsigned int mouseButton, ActionControl& control);
 	void AddButtonBinaryControl(unsigned int mouseButton, BinaryControl& control);
-
 	void AddMouseMotionControl(MotionControl& control, float weight = 1.0f);
 
 	void AddWindowResizeCallback(std::function<void(unsigned int, unsigned int)> callback);

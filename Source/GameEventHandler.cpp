@@ -109,7 +109,7 @@ void GameEventHandler::OnMouseMove(unsigned int mousePositionX, unsigned int mou
 	}
 }
 
-void GameEventHandler::OnWindowResized(unsigned int windowWidth, unsigned int windowHeight)
+void GameEventHandler::OnWindowResize(unsigned int windowWidth, unsigned int windowHeight)
 {
 	for (std::function<void(unsigned int, unsigned int)> callback : windowResizedCallbacks)
 	{

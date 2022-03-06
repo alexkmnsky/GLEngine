@@ -14,7 +14,7 @@ public:
 	virtual void OnMouseUp(unsigned int mouseButton, unsigned char numberOfClicks) {}
 	virtual void OnMouseMove(unsigned int mousePositionX, unsigned int mousePositionY,
 		int deltaX, int deltaY) {}
-	virtual void OnWindowResized(unsigned int windowWidth, unsigned int windowHeight) {}
+	virtual void OnWindowResize(unsigned int windowWidth, unsigned int windowHeight) {}
 
 private:
 	// Disallow copy and assign
