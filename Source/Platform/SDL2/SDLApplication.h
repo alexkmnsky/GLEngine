@@ -10,7 +10,10 @@ public:
 	virtual ~SDLApplication();
 	virtual void ProcessMessages(float deltaTime, IApplicationEventHandler& eventHandler);
 
-	virtual inline bool IsRunning() { return isRunning; }
+	virtual bool IsRunning() { return isRunning; }
+
+	virtual void LockMouse();
+	virtual void UnlockMouse();
 
 private:
 	SDLApplication();

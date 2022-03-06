@@ -33,6 +33,16 @@ SDLApplication::~SDLApplication()
 	}
 }
 
+void SDLApplication::LockMouse()
+{
+	SDL_SetRelativeMouseMode(SDL_TRUE);
+}
+
+void SDLApplication::UnlockMouse()
+{
+	SDL_SetRelativeMouseMode(SDL_FALSE);
+}
+
 void SDLApplication::ProcessMessages(float deltaTime, IApplicationEventHandler& eventHandler)
 {
 	eventHandler.Update();
@@ -60,7 +70,7 @@ void SDLApplication::ProcessMessages(float deltaTime, IApplicationEventHandler& 
 			break;
 		case SDL_WINDOWEVENT:
 			if (e.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
-				eventHandler.OnWindowResized(e.window.data1, e.window.data2);
+				eventHandler.OnWindowResize(e.window.data1, e.window.data2);
 			break;
 		case SDL_QUIT:
 			isRunning = false;
