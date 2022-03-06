@@ -5,12 +5,12 @@
 class MotionControl
 {
 public:
-	inline void Add(glm::ivec2 delta) { this->delta += delta; }
-	inline void Add(int x, int y) { delta += glm::ivec2(x, y); }	
-	inline void Set(glm::ivec2 delta) { this->delta = delta; }
-	inline void Set(int x, int y) { delta = glm::ivec2(x, y); }
-	inline glm::ivec2 Get() { return delta; }
+	void Add(glm::vec2 delta) { this->delta += delta; }
+	void Add(float x, float y) { delta += glm::vec2(x, y); }
+	void Set(glm::vec2 delta) { this->delta = delta; }
+	void Set(float x, float y) { delta = glm::vec2(x, y); }
+	glm::vec2 Get() { return delta; }
 
 private:
-	glm::ivec2 delta;
+	glm::vec2 delta;
 };
