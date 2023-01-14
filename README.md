@@ -1,8 +1,8 @@
 # OpenGL Game Engine Project
-OpenGL and SDL2 game engine written in C++
+OpenGL and SDL2 game engine written in C++. This project was created in collaboration with [Maxwell Hunt](https://github.com/Maxwell-Hunt).
 
 ## Current features
-* Built in Entity Component System[^1] (ECS) architecture
+* Built with Entity Component System[^1] (ECS) architecture
 * 3D model loading and rendering with transformations
 * Texture mapping
 * Text rendering
@@ -26,8 +26,6 @@ Next, clone the project and open `GLEngine.sln` using Visual Studio. The project
 Currently no binaries are released, this may change in the future.
 
 ## Credits
-This project was created in collaboration with [Maxwell Hunt](https://github.com/Maxwell-Hunt).
-
 * [Intro to Modern OpenGL Tutorial](https://www.youtube.com/watch?v=ftiKrP3gW3k&list=PLEETnX-uPtBXT9T-hD0Bj31DSnwio-ywh) by Benny Bobaganoosh "thebennybox"
 * [3D Game Programming Tutorial](https://www.youtube.com/watch?v=0t91FvMJXAs&list=PLEETnX-uPtBUrfzE3Dxy3PWyApnW6YEMm) by Benny Bobaganoosh "thebennybox"
 * [Texture Packing for Fonts](https://straypixels.net/texture-packing-for-fonts/) by Edward Lu "StrayPixels"
