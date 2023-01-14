@@ -1,3 +1,5 @@
+/** Copyright (c) 2022-2023 Alexander Kaminsky and Maxwell Hunt */
+
 #include "TextRenderer.h"
 
 #include <GLM/gtc/type_ptr.hpp>

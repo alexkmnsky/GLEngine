@@ -1,3 +1,5 @@
+/** Copyright (c) 2022-2023 Alexander Kaminsky and Maxwell Hunt */
+
 #include "TexturePacker.h"
 
 TexturePacker::TexturePacker(glm::ivec2 initialSize)

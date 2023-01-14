@@ -1,3 +1,5 @@
+/** Copyright (c) 2022-2023 Alexander Kaminsky and Maxwell Hunt */
+
 #pragma once
 
 #include <ft2build.h>
